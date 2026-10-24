@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Интерактивная корзина ДораТехно с изменением количества, промокодом и расчётом суммы.">
+    <title>Корзина — ДораТехно</title>
+    <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <script src="js/data.js" defer></script>
+    <script src="js/storage.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/cart.js" defer></script>
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main">Перейти к содержимому</a>
+    <header class="site-header">
+      <div class="container">
+        <div class="site-header__inner">
+          <a class="site-header__logo" href="index.html"><span class="site-header__mark" aria-hidden="true">Д</span>ДораТехно</a>
+          <nav class="site-nav" aria-label="Основная навигация">
+            <ul class="site-nav__list">
+              <li class="site-nav__item"><a class="site-nav__link" href="index.html">Главная</a></li>
+              <li class="site-nav__item"><a class="site-nav__link" href="catalog.html">Каталог</a></li>
+              <li class="site-nav__item"><a class="site-nav__link site-nav__link--active" href="cart.html" aria-current="page">Корзина</a></li>
+              <li class="site-nav__item"><a class="site-nav__link" href="order.html">Заявки</a></li>
+              <li class="site-nav__item"><a class="site-nav__link" href="delivery.html">Доставка</a></li>
+              <li class="site-nav__item"><a class="site-nav__link" href="contacts.html">Контакты</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" id="main">
+      <nav class="breadcrumbs" aria-label="Хлебные крошки">
+        <a href="index.html">Главная</a>
+        <span class="breadcrumbs__current" aria-current="page">Корзина</span>
+      </nav>
+      <section class="page-heading">
+        <h1>Корзина</h1>
+        <p class="muted">Состав корзины сохраняется в браузере и остаётся после перезагрузки страницы.</p>
+      </section>
+
+      <ul class="cart-assurance" aria-label="Условия заказа">
+        <li><strong data-assurance-count>0 товаров</strong><span>в корзине</span></li>
+        <li><strong>0 ₽</strong><span>самовывоз</span></li>
+        <li><strong>Оплата</strong><span>при получении</span></li>
+      </ul>
+
+      <p class="catalog-empty" data-cart-empty hidden>Корзина пуста. Добавьте товары из каталога.</p>
+      <div class="order-layout section">
+        <section class="cart-list" data-cart-items aria-label="Товары в корзине" aria-live="polite"></section>
+
+        <aside class="order-info" data-cart-summary hidden>
+          <h2>Ваш заказ</h2>
+          <dl class="order-totals">
+            <div>
+              <dt data-cart-count>Товары, 0 шт.</dt>
+              <dd data-cart-subtotal>0 ₽</dd>
+            </div>
+            <div data-cart-discount-row hidden>
+              <dt>Скидка</dt>
+              <dd data-cart-discount>0 ₽</dd>
+            </div>
+            <div>
+              <dt>Самовывоз</dt>
+              <dd>Бесплатно</dd>
+            </div>
+            <div class="order-totals__total">
+              <dt>Итого</dt>
+              <dd data-cart-total>0 ₽</dd>
+            </div>
+          </dl>
+
+          <form class="promo-form" data-promo-form>
+            <label for="promo-code">Промокод</label>
+            <div class="promo-form__row">
+              <input class="order-form__input" id="promo-code" type="text" placeholder="DORA10" autocomplete="off">
+              <button class="button button--secondary" type="submit">Применить</button>
+            </div>
+            <p class="form-message" data-promo-message aria-live="polite"></p>
+          </form>
+
+          <a class="button" href="order.html?source=cart#new-order">Оформить заявку</a>
+          <button class="button button--secondary" type="button" data-action="clear-cart">Очистить корзину</button>
+          <p class="order-info__link"><a href="catalog.html">Продолжить выбор →</a></p>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="site-footer__inner">
+          <div><a class="site-header__logo" href="index.html">ДораТехно</a><p class="muted">Техника, которую легко выбрать.</p></div>
+          <nav class="site-footer__links" aria-label="Ссылки в подвале">
+            <a href="catalog.html">Каталог</a><a href="order.html">Мои заявки</a><a href="delivery.html">Доставка</a><a href="contacts.html">Контакты</a>
+          </nav>
+        </div>
+        <p class="site-footer__note">© 2026 ДораТехно. Магазин электронной техники.</p>
+      </div>
+    </footer>
+    <a class="back-to-top" href="#top" aria-label="Наверх">↑</a>
+  </body>
+</html>
