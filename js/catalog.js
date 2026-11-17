@@ -153,20 +153,14 @@
     const details = makeElement('a', 'button', 'Подробнее');
     details.href = product.page;
 
-    const orderLink = makeElement('a', 'button button--secondary', product.isAvailable ? 'Оформить заявку' : 'Нет в наличии');
-    orderLink.dataset.action = 'order-product';
-    orderLink.dataset.productId = String(product.id);
-    if (product.isAvailable) {
-      orderLink.href = `order.html?product=${product.id}#new-order`;
-    } else {
-      orderLink.classList.add('is-disabled');
-      orderLink.setAttribute('aria-disabled', 'true');
-    }
-
-    const cartLink = makeElement('a', 'button button--secondary', 'Открыть корзину');
-    cartLink.href = 'cart.html';
-    cartLink.dataset.action = 'open-cart';
-    cartLink.dataset.productId = String(product.id);
+    const cartLabel = !product.isAvailable
+      ? 'Нет в наличии'
+      : shop.storage.hasCartItem(product.id) ? 'Добавлено' : 'Добавить в корзину';
+    const cartButton = makeElement('button', 'button button--secondary', cartLabel);
+    cartButton.type = 'button';
+    cartButton.dataset.action = 'add-to-cart';
+    cartButton.dataset.productId = String(product.id);
+    cartButton.disabled = !product.isAvailable;
 
     const favorite = shop.storage.getFavorites().includes(product.id);
     const favoriteButton = makeElement('button', 'product-card__favorite', favorite ? '♥' : '♡');
@@ -176,7 +170,7 @@
     favoriteButton.setAttribute('aria-label', favorite ? `Убрать ${product.title} из избранного` : `Добавить ${product.title} в избранное`);
     favoriteButton.setAttribute('aria-pressed', String(favorite));
 
-    actions.append(details, orderLink, cartLink);
+    actions.append(details, cartButton);
     card.append(image, badge, category, title, description, specs, price, actions, favoriteButton);
     return card;
   }
@@ -307,12 +301,12 @@
       if (!product) {
         return;
       }
-      if (control.dataset.action === 'open-cart') {
-        event.preventDefault();
-        if (product.isAvailable && !shop.storage.hasCartItem(product.id)) {
-          shop.storage.addToCart(product.id);
+      if (control.dataset.action === 'add-to-cart') {
+        if (!product.isAvailable) {
+          return;
         }
-        window.location.assign(control.href);
+        shop.storage.addToCart(product.id);
+        showMessage(`${product.title} добавлен в корзину.`);
         return;
       }
       if (control.dataset.action === 'toggle-favorite') {

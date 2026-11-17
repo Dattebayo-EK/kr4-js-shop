@@ -84,18 +84,5 @@
 
   window.addEventListener('resize', () => showCards(Math.min(currentIndex, getMaximumIndex()), false));
 
-  document.querySelectorAll('[data-add-to-cart]').forEach((link) => {
-    link.addEventListener('click', (event) => {
-      const product = shop.findProductById(link.dataset.addToCart);
-      if (!product || !product.isAvailable) {
-        event.preventDefault();
-        return;
-      }
-      if (!shop.storage.hasCartItem(product.id)) {
-        shop.storage.addToCart(product.id);
-      }
-    });
-  });
-
   showCards(0, false);
 })(window.DoraShop || {});

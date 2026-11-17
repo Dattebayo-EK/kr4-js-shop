@@ -14,8 +14,6 @@
   const formMessage = form.querySelector('.form-message');
   const orderHistoryContainer = document.querySelector('[data-order-history]');
   const orderHistoryEmpty = document.querySelector('[data-order-history-empty]');
-  const urlParams = new URLSearchParams(window.location.search);
-  let initialSelection = urlParams.get('product') || (urlParams.get('source') === 'cart' ? 'cart' : '');
   const sampleOrders = [
     { number: 'DT-1042', createdAt: '2026-09-22', delivery: 'pickup', items: [{ id: 8, price: 119990, quantity: 1 }], status: 'Отменён' },
     { number: 'DT-1037', createdAt: '2026-09-18', delivery: 'pickup', items: [{ id: 2, price: 44990, quantity: 1 }], status: 'Получен' },
@@ -140,54 +138,27 @@
     if (productInput.value === 'cart') {
       return getCartItems();
     }
-    const product = shop.products.find((item) => item.slug === productInput.value && item.isAvailable);
-    return product
-      ? [{ id: product.id, title: product.title, price: product.price, quantity: 1 }]
-      : [];
+    return [];
   }
 
   function updateProductOptions() {
-    const currentValue = productInput.value || initialSelection;
-    const selectedProduct = shop.products.find((product) => (
-      product.slug === currentValue || String(product.id) === currentValue
-    ));
-    const wantedValue = selectedProduct ? selectedProduct.slug : currentValue;
-    initialSelection = '';
     productInput.replaceChildren();
-
-    const placeholder = new Option('Выберите товар', '');
-    productInput.append(placeholder);
-    const productOrder = [7, 1, 4, 8, 9, 2, 3, 5, 6];
-    productOrder.forEach((id) => {
-      const product = shop.findProductById(id);
-      if (!product) {
-        return;
-      }
-      const option = new Option(`${product.title} — ${shop.formatPrice(product.price)}`, product.slug);
-      option.disabled = !product.isAvailable;
-      productInput.append(option);
-    });
-
     const cartItems = getCartItems();
     const count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const discount = shop.storage.getPromoCode() === 'DORA10' ? Math.round(subtotal * 0.1) : 0;
     const cartLabel = count > 0
-      ? `Корзина: ${count} шт. — ${shop.formatPrice(subtotal - discount)}`
-      : 'Корзина пуста';
-    const cartOption = new Option(cartLabel, 'cart');
+      ? `Состав из корзины: ${count} шт. — ${shop.formatPrice(subtotal - discount)}`
+      : 'Сначала добавьте товары в корзину';
+    const cartOption = new Option(cartLabel, count > 0 ? 'cart' : '');
     cartOption.disabled = count === 0;
     productInput.append(cartOption);
-
-    const matchingOption = [...productInput.options].find((option) => option.value === wantedValue && !option.disabled);
-    productInput.value = matchingOption ? wantedValue : '';
+    productInput.value = count > 0 ? 'cart' : '';
   }
 
   function validateProduct() {
     if (getSelectedItems().length === 0) {
-      const message = productInput.value === 'cart'
-        ? 'Добавьте товары в корзину перед оформлением заявки.'
-        : 'Выберите доступный товар или корзину.';
+      const message = 'Добавьте товары в корзину перед оформлением заявки.';
       showError(productInput, message);
       return false;
     }
@@ -269,11 +240,10 @@
 
     const orderNumber = `DT-${Date.now().toString().slice(-6)}`;
     const selectedItems = getSelectedItems();
-    const isCartOrder = productInput.value === 'cart';
     const order = {
       number: orderNumber,
       items: selectedItems,
-      discountPercent: isCartOrder && shop.storage.getPromoCode() === 'DORA10' ? 10 : 0,
+      discountPercent: shop.storage.getPromoCode() === 'DORA10' ? 10 : 0,
       delivery: form.querySelector('#page-delivery').value,
       createdAt: new Date().toISOString()
     };
@@ -282,10 +252,8 @@
       formMessage.classList.remove('form-message--success');
       return;
     }
-    if (isCartOrder) {
-      shop.storage.saveCart([]);
-      shop.storage.savePromoCode('');
-    }
+    shop.storage.saveCart([]);
+    shop.storage.savePromoCode('');
     renderOrderHistory();
     formMessage.textContent = `Учебная заявка ${orderNumber} сохранена в этом браузере. На сервер данные не отправлены.`;
     formMessage.classList.add('form-message--success');

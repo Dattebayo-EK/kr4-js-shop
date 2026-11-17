@@ -19,11 +19,13 @@
     return shop.products.find((product) => product.page === page) || null;
   }
 
-  function disableLink(link) {
-    link.removeAttribute('href');
-    link.textContent = 'Нет в наличии';
-    link.classList.add('is-disabled');
-    link.setAttribute('aria-disabled', 'true');
+  function showUnavailableButton(link) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = link.className;
+    button.textContent = 'Нет в наличии';
+    button.disabled = true;
+    link.replaceWith(button);
   }
 
   function getLinkProduct(link) {
@@ -31,35 +33,43 @@
     return card ? getCardProduct(card) : getPageProduct();
   }
 
-  // Ссылки сохраняют оформление КР3, а JS подставляет нужный товар в заявку.
-  document.querySelectorAll('.product-card__actions a[href^="order.html"], .product-detail .actions a[href^="order.html"]').forEach((link) => {
-    const product = getLinkProduct(link);
-    if (!product) {
-      return;
-    }
-    if (!product.isAvailable) {
-      disableLink(link);
-      return;
-    }
-    link.href = `order.html?product=${product.id}#new-order`;
-  });
+  const cartButtons = [];
 
-  // При открытии корзины товар добавляется один раз. Количество меняют уже в корзине.
-  document.querySelectorAll('.product-card__actions a[href="cart.html"]:not([data-add-to-cart]), .product-detail .actions a[href="cart.html"]').forEach((link) => {
-    const product = getLinkProduct(link);
+  // Сначала добавляем товар, а к заявке переходим уже из корзины.
+  document.querySelectorAll('.product-card__actions a[href="cart.html"], .product-detail .actions a[href="cart.html"], [data-add-to-cart]').forEach((link) => {
+    const product = link.dataset.addToCart
+      ? shop.findProductById(link.dataset.addToCart)
+      : getLinkProduct(link);
     if (!product) {
       return;
     }
     if (!product.isAvailable) {
-      disableLink(link);
+      showUnavailableButton(link);
       return;
     }
-    link.addEventListener('click', () => {
-      if (!shop.storage.hasCartItem(product.id)) {
-        shop.storage.addToCart(product.id);
-      }
+
+    cartButtons.push({ link, product });
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      shop.storage.addToCart(product.id);
     });
   });
+
+  function updateCartButtons() {
+    cartButtons.forEach(({ link, product }) => {
+      link.textContent = shop.storage.hasCartItem(product.id)
+        ? 'Добавлено'
+        : 'Добавить в корзину';
+    });
+  }
+
+  document.addEventListener('dora:cart-updated', updateCartButtons);
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'dora-shop-cart') {
+      updateCartButtons();
+    }
+  });
+  updateCartButtons();
 
   // Наличие берётся из data.js, чтобы статические карточки не спорили с каталогом.
   document.querySelectorAll('.product-card').forEach((card) => {

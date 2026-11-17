@@ -76,28 +76,7 @@ window.DoraShop = window.DoraShop || {};
 
   function hasCartItem(productId) {
     const id = Number(productId);
-    return getCart().some((item) => Number(item.id) === id);
-  }
-
-  function toggleCartItem(productId) {
-    const id = Number(productId);
-    const cart = getCart();
-    const itemIndex = cart.findIndex((item) => Number(item.id) === id);
-
-    if (itemIndex !== -1) {
-      cart.splice(itemIndex, 1);
-      saveCart(cart);
-      return false;
-    }
-
-    const product = shop.findProductById(id);
-    if (!product || !product.isAvailable) {
-      return false;
-    }
-
-    cart.push({ id, quantity: 1 });
-    saveCart(cart);
-    return true;
+    return getCart().some((item) => item.id === id);
   }
 
   function getFavorites() {
@@ -134,5 +113,5 @@ window.DoraShop = window.DoraShop || {};
     document.dispatchEvent(new CustomEvent('dora:promo-updated'));
   }
 
-  shop.storage = { getCart, saveCart, addToCart, hasCartItem, toggleCartItem, getFavorites, toggleFavorite, getPromoCode, savePromoCode };
+  shop.storage = { getCart, saveCart, addToCart, hasCartItem, getFavorites, toggleFavorite, getPromoCode, savePromoCode };
 })(window.DoraShop);
