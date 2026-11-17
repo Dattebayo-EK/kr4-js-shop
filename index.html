@@ -49,7 +49,7 @@
       <section class="hero">
         <div class="hero__content">
           <p class="eyebrow">ДораТехно / техника под задачу</p>
-          <h1 class="hero__title">Техника под<br>твой ритм.</h1>
+          <h1 class="hero__title"><span>Техника под</span> <span class="hero__title-second">твой ритм.</span></h1>
           <p class="hero__text">Собрали устройства, которые работают вместе: ноутбук для проектов, смартфон для связи и наушники для концентрации.</p>
           <ul class="hero__facts" aria-label="Преимущества подборки">
             <li><strong>3</strong><span>категории</span></li>
@@ -110,13 +110,13 @@
             <h2>Популярные модели</h2>
           </div>
           <div class="product-reel__nav">
-            <div class="product-reel__pagination" aria-label="Управление каруселью">
-              <button class="product-reel__control" type="button" data-carousel-direction="previous" aria-controls="popular-products" aria-label="Показать предыдущие товары">←</button>
-              <button class="product-reel__control" type="button" data-carousel-direction="next" aria-controls="popular-products" aria-label="Показать следующие товары">→</button>
-            </div>
+            <nav class="product-reel__pagination" aria-label="Выбор популярного товара">
+              <a class="product-reel__control" href="#popular-1" data-carousel-direction="previous" aria-label="Прокрутить товары назад">←</a>
+              <a class="product-reel__control" href="#popular-6" data-carousel-direction="next" aria-label="Прокрутить товары вперёд">→</a>
+            </nav>
           </div>
         </div>
-        <div class="products-grid product-reel" id="popular-products" data-carousel tabindex="0" aria-label="Популярные товары">
+        <div class="products-grid product-reel" data-carousel tabindex="0" aria-label="Популярные товары">
           <article class="product-card" id="popular-1">
             <img class="product-card__image" src="images/macbook-air-m2-alt.jpg" srcset="images/macbook-air-m2-alt-480.webp 480w, images/macbook-air-m2-alt-960.webp 960w" sizes="(max-width: 767px) calc(100vw - 64px), (max-width: 1023px) 46vw, 360px" alt="MacBook Air 13″ M2 8/256 ГБ" width="960" height="1440" loading="lazy">
             <span class="product-card__badge">В наличии</span>
@@ -131,8 +131,8 @@
             <p class="product-card__price">79 990 ₽</p>
             <div class="product-card__actions">
               <a class="button" href="product.html">Подробнее</a>
-              <a class="button button--secondary" href="order.html?product=7#new-order">Оформить заявку</a>
-              <button class="button button--secondary" type="button" data-add-to-cart="7">В корзину</button>
+              <a class="button button--secondary" href="order.html#page-product">Оформить заявку</a>
+              <a class="button button--secondary" href="cart.html" data-add-to-cart="7">Открыть корзину</a>
             </div>
           </article>
           <article class="product-card" id="popular-2">
@@ -149,8 +149,8 @@
             <p class="product-card__price">39 990 ₽</p>
             <div class="product-card__actions">
               <a class="button" href="product-pixel-7-pro.html">Подробнее</a>
-              <a class="button button--secondary" href="order.html?product=1#new-order">Оформить заявку</a>
-              <button class="button button--secondary" type="button" data-add-to-cart="1">В корзину</button>
+              <a class="button button--secondary" href="order.html#page-product">Оформить заявку</a>
+              <a class="button button--secondary" href="cart.html" data-add-to-cart="1">Открыть корзину</a>
             </div>
           </article>
           <article class="product-card product-card--discount" id="popular-3">
@@ -167,8 +167,8 @@
             <p class="product-card__price">19 990 ₽ <del class="product-card__old-price">24 990 ₽</del></p>
             <div class="product-card__actions">
               <a class="button" href="product-sony-wh1000xm4.html">Подробнее</a>
-              <a class="button button--secondary" href="order.html?product=4#new-order">Оформить заявку</a>
-              <button class="button button--secondary" type="button" data-add-to-cart="4">В корзину</button>
+              <a class="button button--secondary" href="order.html#page-product">Оформить заявку</a>
+              <a class="button button--secondary" href="cart.html" data-add-to-cart="4">Открыть корзину</a>
             </div>
           </article>
           <article class="product-card" id="popular-4">
@@ -185,8 +185,8 @@
             <p class="product-card__price">44 990 ₽</p>
             <div class="product-card__actions">
               <a class="button" href="product-iphone-13-pro.html">Подробнее</a>
-              <a class="button button--secondary" href="order.html?product=2#new-order">Оформить заявку</a>
-              <button class="button button--secondary" type="button" data-add-to-cart="2">В корзину</button>
+              <a class="button button--secondary" href="order.html#page-product">Оформить заявку</a>
+              <a class="button button--secondary" href="cart.html" data-add-to-cart="2">Открыть корзину</a>
             </div>
           </article>
           <article class="product-card" id="popular-5">
@@ -203,8 +203,8 @@
             <p class="product-card__price">39 990 ₽</p>
             <div class="product-card__actions">
               <a class="button" href="product-airpods-max.html">Подробнее</a>
-              <a class="button button--secondary" href="order.html?product=6#new-order">Оформить заявку</a>
-              <button class="button button--secondary" type="button" data-add-to-cart="6">В корзину</button>
+              <a class="button button--secondary" href="order.html#page-product">Оформить заявку</a>
+              <a class="button button--secondary" href="cart.html" data-add-to-cart="6">Открыть корзину</a>
             </div>
           </article>
           <article class="product-card" id="popular-6">
@@ -221,8 +221,8 @@
             <p class="product-card__price">119 990 ₽</p>
             <div class="product-card__actions">
               <a class="button" href="product-macbook-pro-14.html">Подробнее</a>
-              <a class="button button--secondary" href="order.html?product=8#new-order">Оформить заявку</a>
-              <button class="button button--secondary" type="button" data-add-to-cart="8">В корзину</button>
+              <a class="button button--secondary" href="order.html#page-product">Оформить заявку</a>
+              <a class="button button--secondary" href="cart.html" data-add-to-cart="8">Открыть корзину</a>
             </div>
           </article>
         </div>

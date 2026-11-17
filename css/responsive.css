@@ -1,8 +1,3 @@
-/*
-  Адаптивные стили для контрольной работы №3.
-  Подход: Mobile First.
-  Базовые правила ориентированы на узкий экран; улучшения добавляются через min-width.
-*/
 
 *,
 *::before,
@@ -88,6 +83,10 @@ h2 {
 
 .hero__title br {
   display: none;
+}
+
+.hero__title-second {
+  display: inline;
 }
 
 .hero__image {
@@ -331,6 +330,10 @@ h2 {
 
   .hero__title br {
     display: initial;
+  }
+
+  .hero__title-second {
+    display: block;
   }
 
   .category-list,
@@ -672,7 +675,7 @@ h2 {
   }
 }
 
-/* Финальная настройка компонентов после визуальной проверки */
+
 .visually-hidden,
 .spec-table caption {
   position: absolute !important;
@@ -1692,19 +1695,36 @@ a:hover {
 }
 
 /* Контрольная работа №4: интерактивный каталог, корзина и валидация */
-.nav-counter {
-  display: inline-grid;
-  min-width: 1.45rem;
-  min-height: 1.45rem;
-  margin-left: 0.35rem;
-  padding: 0 0.3rem;
-  place-items: center;
-  border-radius: 999px;
-  color: #ffffff;
-  background: var(--color-primary);
-  font-size: 0.75rem;
-  font-weight: 800;
-  line-height: 1;
+.order-form textarea.order-form__input--summary {
+  height: 7rem;
+  min-height: 7rem;
+  max-height: 7rem;
+  padding: 0.75rem 1rem;
+  resize: none;
+  overflow-y: auto;
+  background: #f7f8fa;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.button.is-in-cart,
+.button.is-in-cart:hover {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border-color: rgb(33 107 61 / 35%);
+}
+
+.button.is-disabled,
+.button.is-disabled:hover {
+  color: var(--color-muted);
+  background: var(--color-border);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+.product-detail__tag--muted {
+  color: var(--color-muted);
+  background: var(--color-border);
 }
 
 .catalog-controls {
@@ -1799,6 +1819,10 @@ a:hover {
   font-weight: 700;
 }
 
+.order-info > .button + .button {
+  margin-top: 0.75rem;
+}
+
 .catalog-empty {
   padding: 1.25rem;
   border: 1px dashed var(--color-border);
@@ -1873,6 +1897,12 @@ a:hover {
   color: var(--color-success);
 }
 
+.form-error:empty,
+.form-message:empty {
+  min-height: 0;
+  margin: 0;
+}
+
 @media (min-width: 48rem) {
   .catalog-controls__grid {
     grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(12rem, 1fr));
@@ -1894,88 +1924,138 @@ a:hover {
   }
 }
 
-/* Финальная адаптивная доводка и управление каруселью КР №4 */
-.product-reel {
-  scroll-behavior: smooth;
-}
 
+/* Кнопки управления каруселью сохраняют оформление КР №3. */
 .product-reel__control {
-  flex: 0 0 auto;
   border: 0;
   cursor: pointer;
 }
 
-.product-reel .product-card {
-  height: 100%;
+[hidden] {
+  display: none !important;
 }
 
-.hero > *,
-.hero__facts > *,
-.choice-guide__grid > *,
-.choice-guide__content,
-.product-card,
-.product-card__actions {
-  min-width: 0;
+/* Поиск открывается поверх каталога, поэтому обычная сетка КР №3 не сдвигается. */
+.catalog-tools-button {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  color: var(--color-primary-dark);
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
-.choice-guide__content {
-  width: 100%;
+.catalog-tools-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
 }
 
-.choice-guide__card h3,
-.product-card__title,
-.cart-item__title {
-  overflow-wrap: anywhere;
+.catalog-dialog {
+  width: min(70rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100vh - 2rem);
+  padding: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--color-surface);
+  box-shadow: 0 24px 70px rgb(25 26 28 / 30%);
 }
 
-@media (max-width: 47.999rem) {
-  .hero {
-    min-height: 0;
-  }
+.catalog-dialog::backdrop {
+  background: rgb(25 26 28 / 58%);
+}
 
-  .hero .actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
+.catalog-dialog .catalog-controls {
+  border: 0;
+  box-shadow: none;
+}
 
-  .hero .actions .button,
-  .hero__text-link {
-    width: 100%;
-    text-align: center;
-  }
+.catalog-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
 
-  .hero__facts li {
-    overflow-wrap: anywhere;
-  }
+.catalog-dialog .catalog-count {
+  margin: 1rem 0 0;
+}
 
-  .choice-guide__card,
-  .choice-guide__card--main {
-    min-height: 0;
-  }
+.catalog-message:empty {
+  display: none;
+}
 
-  .choice-guide__content {
-    place-items: stretch;
-  }
+.product-card__favorite {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: 0 3px 12px rgb(25 26 28 / 12%);
+  font: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
 
-  .choice-guide__content .button {
-    width: 100%;
-  }
+.product-card__favorite:hover,
+.product-card__favorite:focus-visible,
+.product-card__favorite[aria-pressed="true"] {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
 
-  .product-reel.products-grid {
-    grid-auto-columns: minmax(0, 100%);
-    padding-inline: 0;
-    scroll-padding-inline: 0;
-  }
+/* Дополнительные действия не меняют исходные размеры блока заказа КР №3. */
+.order-info[data-cart-summary] {
+  position: relative;
+}
 
-  .product-reel .product-card {
-    scroll-margin-inline: 0;
-  }
+.cart-extra {
+  height: 0;
+}
 
-  .product-reel__nav {
-    justify-content: space-between;
-  }
+.cart-extra > summary {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  color: var(--color-primary-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
 
-  .product-reel .product-card__actions .button {
-    flex: 1 1 100%;
-  }
+.cart-extra__panel {
+  position: absolute;
+  z-index: 5;
+  top: 4rem;
+  right: 1rem;
+  width: calc(100% - 2rem);
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  box-shadow: 0 14px 35px rgb(25 26 28 / 18%);
+}
+
+.cart-extra__panel .promo-form {
+  margin: 0 0 1rem;
+}
+
+.cart-item__remove {
+  min-height: 44px;
+  padding: 0.35rem 0.5rem;
+  border: 0;
+  background: transparent;
+  font-size: 0.85rem;
+  text-decoration: underline;
 }

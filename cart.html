@@ -40,11 +40,10 @@
       </nav>
       <section class="page-heading">
         <h1>Корзина</h1>
-        <p class="muted">Состав корзины сохраняется в браузере и остаётся после перезагрузки страницы.</p>
       </section>
 
       <ul class="cart-assurance" aria-label="Условия заказа">
-        <li><strong data-assurance-count>0 товаров</strong><span>в корзине</span></li>
+        <li><strong data-assurance-count>3 товара</strong><span>в наличии</span></li>
         <li><strong>0 ₽</strong><span>самовывоз</span></li>
         <li><strong>Оплата</strong><span>при получении</span></li>
       </ul>
@@ -74,18 +73,24 @@
             </div>
           </dl>
 
-          <form class="promo-form" data-promo-form>
-            <label for="promo-code">Промокод</label>
-            <div class="promo-form__row">
-              <input class="order-form__input" id="promo-code" type="text" placeholder="DORA10" autocomplete="off">
-              <button class="button button--secondary" type="submit">Применить</button>
-            </div>
-            <p class="form-message" data-promo-message aria-live="polite"></p>
-          </form>
-
+          <p class="muted">Стоимость доставки зависит от выбранного способа получения и уточняется при подтверждении заявки.</p>
           <a class="button" href="order.html?source=cart#new-order">Оформить заявку</a>
-          <button class="button button--secondary" type="button" data-action="clear-cart">Очистить корзину</button>
           <p class="order-info__link"><a href="catalog.html">Продолжить выбор →</a></p>
+
+          <details class="cart-extra">
+            <summary>Промокод</summary>
+            <div class="cart-extra__panel">
+              <form class="promo-form" data-promo-form>
+                <label for="promo-code">Промокод</label>
+                <div class="promo-form__row">
+                  <input class="order-form__input" id="promo-code" type="text" placeholder="DORA10" autocomplete="off">
+                  <button class="button button--secondary" type="submit">Применить</button>
+                </div>
+                <p class="form-message" data-promo-message aria-live="polite"></p>
+              </form>
+              <button class="button button--secondary" type="button" data-action="clear-cart">Очистить корзину</button>
+            </div>
+          </details>
         </aside>
       </div>
     </main>

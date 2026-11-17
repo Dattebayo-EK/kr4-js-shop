@@ -1,67 +1,80 @@
 'use strict';
 
 (function initializeCommonUi(shop) {
-  if (!shop.storage) {
+  if (!shop.storage || !Array.isArray(shop.products)) {
     return;
   }
 
-  const cartLink = document.querySelector('.site-nav__link[href="cart.html"]');
-
-  function getCartCount() {
-    return shop.storage.getCart().reduce((sum, item) => sum + item.quantity, 0);
+  function getPageProduct() {
+    const page = window.location.pathname.split('/').pop();
+    return shop.products.find((product) => product.page === page);
   }
 
-  function updateCartCounter() {
-    if (!cartLink) {
-      return;
+  function getCardProduct(card) {
+    const link = card?.querySelector('.product-card__title a[href]');
+    if (!link) {
+      return null;
     }
-    let badge = cartLink.querySelector('.nav-counter');
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.classList.add('nav-counter');
-      badge.setAttribute('aria-label', 'Количество товаров в корзине');
-      cartLink.append(badge);
-    }
-    badge.textContent = String(getCartCount());
+    const page = link.getAttribute('href');
+    return shop.products.find((product) => product.page === page) || null;
   }
 
-  function initializeProductPage() {
-    if (!Array.isArray(shop.products)) {
+  function disableLink(link) {
+    link.removeAttribute('href');
+    link.textContent = 'Нет в наличии';
+    link.classList.add('is-disabled');
+    link.setAttribute('aria-disabled', 'true');
+  }
+
+  function getLinkProduct(link) {
+    const card = link.closest('.product-card');
+    return card ? getCardProduct(card) : getPageProduct();
+  }
+
+  // Ссылки сохраняют оформление КР3, а JS подставляет нужный товар в заявку.
+  document.querySelectorAll('.product-card__actions a[href^="order.html"], .product-detail .actions a[href^="order.html"]').forEach((link) => {
+    const product = getLinkProduct(link);
+    if (!product) {
       return;
     }
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const product = shop.products.find((item) => item.page === currentPage);
-    const actions = document.querySelector('.product-detail .actions');
-    if (!product || !actions) {
+    if (!product.isAvailable) {
+      disableLink(link);
       return;
     }
+    link.href = `order.html?product=${product.id}#new-order`;
+  });
 
-    const orderLink = actions.querySelector('a[href^="order.html"]');
-    if (orderLink) {
-      orderLink.href = `order.html?product=${product.id}#new-order`;
+  // При открытии корзины товар добавляется один раз. Количество меняют уже в корзине.
+  document.querySelectorAll('.product-card__actions a[href="cart.html"]:not([data-add-to-cart]), .product-detail .actions a[href="cart.html"]').forEach((link) => {
+    const product = getLinkProduct(link);
+    if (!product) {
+      return;
     }
-
-    const cartButton = document.createElement('button');
-    cartButton.classList.add('button', 'button--secondary');
-    cartButton.type = 'button';
-    cartButton.textContent = product.isAvailable ? 'Добавить в корзину' : 'Нет в наличии';
-    cartButton.disabled = !product.isAvailable;
-
-    const message = document.createElement('p');
-    message.classList.add('product-action-message');
-    message.setAttribute('role', 'status');
-    message.setAttribute('aria-live', 'polite');
-
-    cartButton.addEventListener('click', () => {
-      shop.storage.addToCart(product.id);
-      message.textContent = `${product.title} добавлен в корзину.`;
+    if (!product.isAvailable) {
+      disableLink(link);
+      return;
+    }
+    link.addEventListener('click', () => {
+      if (!shop.storage.hasCartItem(product.id)) {
+        shop.storage.addToCart(product.id);
+      }
     });
+  });
 
-    actions.append(cartButton);
-    actions.after(message);
+  // Наличие берётся из data.js, чтобы статические карточки не спорили с каталогом.
+  document.querySelectorAll('.product-card').forEach((card) => {
+    const product = getCardProduct(card);
+    const badge = card.querySelector('.product-card__badge');
+    if (product && badge && !product.isAvailable) {
+      badge.textContent = 'Нет в наличии';
+      badge.classList.add('product-card__badge--muted');
+    }
+  });
+
+  const pageProduct = getPageProduct();
+  const pageBadge = document.querySelector('.product-detail__tag');
+  if (pageProduct && pageBadge && !pageProduct.isAvailable) {
+    pageBadge.textContent = 'Нет в наличии';
+    pageBadge.classList.add('product-detail__tag--muted');
   }
-
-  updateCartCounter();
-  initializeProductPage();
-  document.addEventListener('dora:cart-updated', updateCartCounter);
 })(window.DoraShop || {});

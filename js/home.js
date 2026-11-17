@@ -2,7 +2,7 @@
 
 (function initializeHomePage(shop) {
   const carousel = document.querySelector('[data-carousel]');
-  if (!carousel) {
+  if (!carousel || !shop.storage || !Array.isArray(shop.products)) {
     return;
   }
 
@@ -61,8 +61,14 @@
     showCards(currentIndex + direction * step);
   }
 
-  previousButton.addEventListener('click', () => moveCarousel(-1));
-  nextButton.addEventListener('click', () => moveCarousel(1));
+  previousButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    moveCarousel(-1);
+  });
+  nextButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    moveCarousel(1);
+  });
 
   carousel.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -78,21 +84,16 @@
 
   window.addEventListener('resize', () => showCards(Math.min(currentIndex, getMaximumIndex()), false));
 
-  document.querySelectorAll('[data-add-to-cart]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const product = shop.findProductById(button.dataset.addToCart);
-      if (!product || !product.isAvailable || !shop.storage) {
+  document.querySelectorAll('[data-add-to-cart]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const product = shop.findProductById(link.dataset.addToCart);
+      if (!product || !product.isAvailable) {
+        event.preventDefault();
         return;
       }
-
-      shop.storage.addToCart(product.id);
-      const originalText = button.textContent;
-      button.textContent = 'Добавлено';
-      button.disabled = true;
-      window.setTimeout(() => {
-        button.textContent = originalText;
-        button.disabled = false;
-      }, 1400);
+      if (!shop.storage.hasCartItem(product.id)) {
+        shop.storage.addToCart(product.id);
+      }
     });
   });
 

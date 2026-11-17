@@ -60,22 +60,12 @@
       <section class="section" id="new-order">
         <h2>Оформление заявки</h2>
         <div class="order-layout">
-          <form class="order-form" action="order.html#new-order" method="get" data-order-form novalidate>
+          <form class="order-form" action="#new-order" method="post" data-order-form novalidate>
             <p class="order-form__note">Поля со звёздочкой обязательны.</p>
             <div class="order-form__field">
               <label class="order-form__label" for="page-product">Товар или корзина *</label>
               <select class="order-form__input" id="page-product" name="product" required>
                 <option value="">Выберите товар</option>
-                <option value="macbook-air-m2-8gb">MacBook Air 13″ M2 8/256 ГБ — 79 990 ₽</option>
-                <option value="pixel-7-pro">Google Pixel 7 Pro 12/128 ГБ — 39 990 ₽</option>
-                <option value="sony-wh1000xm4">Sony WH-1000XM4 — 19 990 ₽</option>
-                <option value="macbook-pro-14-m1">MacBook Pro 14″ M1 Pro 16/512 ГБ — 119 990 ₽</option>
-                <option value="macbook-air-m2-16gb">MacBook Air 13″ M2 16/512 ГБ — 99 990 ₽</option>
-                <option value="iphone-13-pro">iPhone 13 Pro 128 ГБ — 44 990 ₽</option>
-                <option value="galaxy-s23-ultra">Samsung Galaxy S23 Ultra 12/512 ГБ — 89 990 ₽</option>
-                <option value="bose-qc25">Bose QuietComfort 25 — 8 990 ₽</option>
-                <option value="airpods-max">Apple AirPods Max (Lightning) — 39 990 ₽</option>
-                <option value="cart">Корзина: MacBook Air 13″ M2, Pixel 7 Pro, Sony WH-1000XM4 — 139 970 ₽</option>
               </select>
               <p class="form-error" id="page-product-error" data-error-for="page-product"></p>
             </div>
@@ -114,22 +104,22 @@
             </div>
             <div class="order-form__check">
               <input id="page-agreement" name="agreement" type="checkbox" value="yes" required>
-              <label for="page-agreement">Согласен на обработку персональных данных для рассмотрения заявки *</label>
-              <p class="form-error" id="page-agreement-error" data-error-for="page-agreement"></p>
+              <label for="page-agreement">Понимаю, что это учебная заявка без отправки на сервер *</label>
             </div>
+            <p class="form-error" id="page-agreement-error" data-error-for="page-agreement"></p>
             <div class="order-form__actions">
-              <button class="button" type="submit">Отправить заявку</button>
+              <button class="button" type="submit">Сохранить заявку</button>
             </div>
             <p class="form-message" role="status" aria-live="polite"></p>
           </form>
           <aside class="order-info">
             <h3>Что будет дальше</h3>
             <ol class="order-info__steps">
-              <li>Проверим наличие выбранных товаров.</li>
-              <li>Свяжемся с вами и уточним детали заказа.</li>
-              <li>Подготовим товары к получению.</li>
+              <li>Проверим заполнение обязательных полей.</li>
+              <li>Сохраним учебную заявку в этом браузере.</li>
+              <li>Покажем её в истории заявок ниже.</li>
             </ol>
-            <p>Оплата — при получении. Адрес и стоимость доставки согласуем до подтверждения заказа.</p>
+            <p>Это учебная форма: данные не отправляются на сервер, настоящий заказ не создаётся.</p>
             <a href="delivery.html">Условия доставки →</a>
           </aside>
         </div>
@@ -139,41 +129,8 @@
           <h2>История заявок</h2>
           <p class="muted">Последние заказы</p>
         </div>
-        <div class="order-history">
-          <article class="order-history__item">
-            <div class="order-history__heading">
-              <h3>Заявка №DT-1042</h3>
-              <span class="order-status order-status--muted">Отменён</span>
-            </div>
-            <p class="muted">
-              <time datetime="2026-09-22">22.09.2026</time> · Самовывоз</p>
-            <a href="product-macbook-pro-14.html">MacBook Pro 14″ M1 Pro 16/512 ГБ</a>
-            <p class="order-history__price">1 шт. · 119 990 ₽</p>
-            <a href="contacts.html#feedback">Обратиться по заявке →</a>
-          </article>
-          <article class="order-history__item">
-            <div class="order-history__heading">
-              <h3>Заявка №DT-1037</h3>
-              <span class="order-status order-status--success">Получен</span>
-            </div>
-            <p class="muted">
-              <time datetime="2026-09-18">18.09.2026</time> · Самовывоз</p>
-            <a href="product-iphone-13-pro.html">iPhone 13 Pro 128 ГБ</a>
-            <p class="order-history__price">1 шт. · 44 990 ₽</p>
-            <a href="contacts.html#feedback">Обратиться по заявке →</a>
-          </article>
-          <article class="order-history__item">
-            <div class="order-history__heading">
-              <h3>Заявка №DT-1026</h3>
-              <span class="order-status order-status--success">Получен</span>
-            </div>
-            <p class="muted">
-              <time datetime="2026-09-10">10.09.2026</time> · Самовывоз</p>
-            <a href="product-sony-wh1000xm4.html">Sony WH-1000XM4</a>
-            <p class="order-history__price">1 шт. · 19 990 ₽</p>
-            <a href="contacts.html#feedback">Обратиться по заявке →</a>
-          </article>
-        </div>
+        <p class="catalog-empty" data-order-history-empty hidden>Заявок пока нет. После оформления они появятся здесь.</p>
+        <div class="order-history" data-order-history></div>
       </section>
     </main>
     <footer class="site-footer">

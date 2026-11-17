@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Интерактивный каталог ДораТехно с поиском, фильтрацией, сортировкой, корзиной и избранным.">
+    <meta name="description" content="Выберите раздел: смартфоны, наушники или ноутбуки. Девять моделей с подробными характеристиками.">
     <title>Каталог техники — ДораТехно</title>
     <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/style.css">
@@ -19,40 +19,53 @@
       <div class="container">
         <div class="site-header__inner">
           <a class="site-header__logo" href="index.html">
-            <span class="site-header__mark" aria-hidden="true">Д</span>ДораТехно
-          </a>
+            <span class="site-header__mark" aria-hidden="true">Д</span>ДораТехно</a>
           <nav class="site-nav" aria-label="Основная навигация">
             <ul class="site-nav__list">
-              <li class="site-nav__item"><a class="site-nav__link" href="index.html">Главная</a></li>
-              <li class="site-nav__item"><a class="site-nav__link site-nav__link--active" href="catalog.html" aria-current="page">Каталог</a></li>
-              <li class="site-nav__item"><a class="site-nav__link" href="cart.html">Корзина</a></li>
-              <li class="site-nav__item"><a class="site-nav__link" href="order.html">Заявки</a></li>
-              <li class="site-nav__item"><a class="site-nav__link" href="delivery.html">Доставка</a></li>
-              <li class="site-nav__item"><a class="site-nav__link" href="contacts.html">Контакты</a></li>
+              <li class="site-nav__item">
+                <a class="site-nav__link" href="index.html">Главная</a>
+              </li>
+              <li class="site-nav__item">
+                <a class="site-nav__link site-nav__link--active" href="catalog.html" aria-current="page">Каталог</a>
+              </li>
+              <li class="site-nav__item">
+                <a class="site-nav__link" href="cart.html">Корзина</a>
+              </li>
+              <li class="site-nav__item">
+                <a class="site-nav__link" href="order.html">Заявки</a>
+              </li>
+              <li class="site-nav__item">
+                <a class="site-nav__link" href="delivery.html">Доставка</a>
+              </li>
+              <li class="site-nav__item">
+                <a class="site-nav__link" href="contacts.html">Контакты</a>
+              </li>
             </ul>
           </nav>
         </div>
       </div>
     </header>
-
     <main class="container" id="main">
       <nav class="breadcrumbs" aria-label="Хлебные крошки">
         <a href="index.html">Главная</a>
         <span class="breadcrumbs__current" aria-current="page">Каталог</span>
+        <button class="catalog-tools-button" type="button" data-action="open-catalog-dialog">Поиск и сортировка</button>
       </nav>
       <section class="page-heading">
-        <p class="eyebrow">Интерактивная витрина</p>
         <h1>Выберите свою технику</h1>
-        <p class="muted">Используйте поиск, фильтры и сортировку. Каталог обновляется без перезагрузки страницы.</p>
       </section>
 
-      <section class="catalog-controls section" aria-labelledby="catalog-controls-title">
+      <dialog class="catalog-dialog" id="catalog-dialog" aria-labelledby="catalog-controls-title">
+      <section class="catalog-controls" aria-labelledby="catalog-controls-title">
         <div class="section__heading">
           <h2 id="catalog-controls-title">Управление каталогом</h2>
-          <button class="button button--secondary" type="button" data-action="reset-catalog">Сбросить</button>
+          <div class="catalog-dialog__actions">
+            <button class="button button--secondary" type="button" data-action="reset-catalog">Сбросить</button>
+            <button class="button button--secondary" type="button" data-action="close-catalog-dialog" aria-label="Закрыть поиск и сортировку">Закрыть</button>
+          </div>
         </div>
         <div class="catalog-controls__grid">
-          <div class="catalog-controls__group catalog-controls__group--search">
+          <div class="catalog-controls__group">
             <label for="catalog-search">Поиск товара</label>
             <input class="order-form__input" id="catalog-search" type="search" placeholder="Например, MacBook или Sony" autocomplete="off">
           </div>
@@ -66,7 +79,7 @@
             </select>
           </div>
           <div class="catalog-controls__group">
-            <label for="sort-select">Сортировка</label>
+            <label for="sort-select">Сортировка в категориях</label>
             <select class="order-form__input" id="sort-select">
               <option value="default">По умолчанию</option>
               <option value="price-asc">Сначала дешевле</option>
@@ -80,20 +93,211 @@
           <label><input id="availability-filter" type="checkbox"> Только в наличии</label>
           <label><input id="favorites-filter" type="checkbox"> Только избранное</label>
         </div>
+        <p class="catalog-count" aria-live="polite">Загрузка каталога…</p>
       </section>
-
-      <section class="section" aria-labelledby="catalog-results-title">
+      </dialog>
+      <p class="catalog-message" role="status" aria-live="polite"></p>
+      <p class="catalog-empty" data-catalog-empty hidden>По выбранным условиям товары не найдены. Измените запрос или сбросьте фильтры.</p>
+      <noscript><p class="catalog-empty">Для интерактивного каталога необходимо включить JavaScript.</p></noscript>
+      <nav class="category-list" aria-label="Категории товаров">
+        <a class="category-list__link" href="catalog.html#phones">Смартфоны<span>3 модели →</span>
+        </a>
+        <a class="category-list__link" href="catalog.html#audio">Наушники<span>3 модели →</span>
+        </a>
+        <a class="category-list__link" href="catalog.html#notebooks">Ноутбуки<span>3 модели →</span>
+        </a>
+      </nav>
+      <section class="catalog-category section" id="phones">
         <div class="section__heading">
-          <h2 id="catalog-results-title">Товары</h2>
-          <p class="catalog-count" aria-live="polite">Загрузка каталога…</p>
+          <h2>Смартфоны</h2>
+          <p class="muted">3 модели</p>
         </div>
-        <p class="catalog-message" role="status" aria-live="polite"></p>
-        <p class="catalog-empty" hidden>По выбранным условиям товары не найдены. Измените запрос или сбросьте фильтры.</p>
-        <div class="products-grid products-grid--catalog" data-products-container></div>
-        <noscript><p class="catalog-empty">Для интерактивного каталога необходимо включить JavaScript.</p></noscript>
+        <div class="catalog-layout">
+          <aside class="catalog-filters" aria-labelledby="phones-filter-title">
+            <h3 class="catalog-filters__title" id="phones-filter-title">Фильтры</h3>
+            <div class="filters-form">
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Цена, ₽</legend><div class="filters-form__range"><div><label class="filters-form__label" for="phones-price-from">От</label><input class="filters-form__input" id="phones-price-from" type="number" min="0" placeholder="0"></div><div><label class="filters-form__label" for="phones-price-to">До</label><input class="filters-form__input" id="phones-price-to" type="number" min="0" placeholder="100000"></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Диагональ экрана</legend><div class="filters-form__options"><div class="filters-form__option"><input id="phones-size-small" type="checkbox"><label for="phones-size-small">До 6,1 дюйма</label></div><div class="filters-form__option"><input id="phones-size-large" type="checkbox"><label for="phones-size-large">От 6,7 дюйма</label></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Встроенная память</legend><div class="filters-form__options"><div class="filters-form__option"><input id="phones-storage-128" type="checkbox"><label for="phones-storage-128">128 ГБ</label></div><div class="filters-form__option"><input id="phones-storage-512" type="checkbox"><label for="phones-storage-512">512 ГБ</label></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Производитель</legend><div class="filters-form__options"><div class="filters-form__option"><input id="phones-brand-google" type="checkbox"><label for="phones-brand-google">Google</label></div><div class="filters-form__option"><input id="phones-brand-apple" type="checkbox"><label for="phones-brand-apple">Apple</label></div><div class="filters-form__option"><input id="phones-brand-samsung" type="checkbox"><label for="phones-brand-samsung">Samsung</label></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Операционная система</legend><div class="filters-form__options"><div class="filters-form__option"><input id="phones-os-android" type="checkbox"><label for="phones-os-android">Android</label></div><div class="filters-form__option"><input id="phones-os-ios" type="checkbox"><label for="phones-os-ios">iOS</label></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Особенности</legend><div class="filters-form__options"><div class="filters-form__option"><input id="phones-feature-5g" type="checkbox"><label for="phones-feature-5g">Поддержка 5G</label></div><div class="filters-form__option"><input id="phones-feature-nfc" type="checkbox"><label for="phones-feature-nfc">Поддержка NFC</label></div></div></fieldset>
+            </div>
+          </aside>
+          <div class="catalog-products">
+            <div class="products-grid" data-products-container data-category="phones"></div>
+            <p class="catalog-empty" data-category-empty hidden>В этой категории товары не найдены. Измените фильтры.</p>
+          </div>
+        </div>
+        <section class="section category-comparison">
+          <h3>Сравнение моделей</h3>
+          <div class="table-wrap">
+            <table class="spec-table">
+              <caption>Смартфоны: основные параметры и цены</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Модель</th>
+                  <th scope="col">Экран</th>
+                  <th scope="col">Память</th>
+                  <th scope="col">Цена</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row"><a href="product-pixel-7-pro.html">Google Pixel 7 Pro 12/128 ГБ</a></th><td>6,7″, LTPO OLED, 3120 × 1440</td><td>12 ГБ / 128 ГБ</td><td>39 990 ₽</td></tr>
+                <tr><th scope="row"><a href="product-iphone-13-pro.html">iPhone 13 Pro 128 ГБ</a></th><td>6,1″, OLED, 2532 × 1170</td><td>Накопитель 128 ГБ</td><td>44 990 ₽</td></tr>
+                <tr><th scope="row"><a href="product-galaxy-s23-ultra.html">Samsung Galaxy S23 Ultra 12/512 ГБ</a></th><td>6,8″, Dynamic AMOLED 2X, 3088 × 1440</td><td>12 ГБ / 512 ГБ</td><td>89 990 ₽</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="catalog-category section" id="audio">
+        <div class="section__heading">
+          <h2>Наушники</h2>
+          <p class="muted">3 модели</p>
+        </div>
+        <div class="catalog-layout">
+          <aside class="catalog-filters" aria-labelledby="audio-filter-title">
+            <h3 class="catalog-filters__title" id="audio-filter-title">Фильтры</h3>
+            <div class="filters-form">
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Цена, ₽</legend><div class="filters-form__range"><div><label class="filters-form__label" for="audio-price-from">От</label><input class="filters-form__input" id="audio-price-from" type="number" min="0" placeholder="0"></div><div><label class="filters-form__label" for="audio-price-to">До</label><input class="filters-form__input" id="audio-price-to" type="number" min="0" placeholder="50000"></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Подключение</legend><div class="filters-form__options"><div class="filters-form__option"><input id="audio-wired" type="checkbox"><label for="audio-wired">Проводные</label></div><div class="filters-form__option"><input id="audio-wireless" type="checkbox"><label for="audio-wireless">Беспроводные</label></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Питание</legend><div class="filters-form__options"><div class="filters-form__option"><input id="audio-battery" type="checkbox"><label for="audio-battery">Аккумулятор</label></div><div class="filters-form__option"><input id="audio-aaa" type="checkbox"><label for="audio-aaa">Батарейка AAA</label></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Производитель</legend><div class="filters-form__options"><div class="filters-form__option"><input id="audio-brand-sony" type="checkbox"><label for="audio-brand-sony">Sony</label></div><div class="filters-form__option"><input id="audio-brand-bose" type="checkbox"><label for="audio-brand-bose">Bose</label></div><div class="filters-form__option"><input id="audio-brand-apple" type="checkbox"><label for="audio-brand-apple">Apple</label></div></div></fieldset>
+              <fieldset class="filters-form__group"><legend class="filters-form__legend">Функции</legend><div class="filters-form__options"><div class="filters-form__option"><input id="audio-noise-cancelling" type="checkbox"><label for="audio-noise-cancelling">Шумоподавление</label></div><div class="filters-form__option"><input id="audio-microphone" type="checkbox"><label for="audio-microphone">Встроенный микрофон</label></div></div></fieldset>
+            </div>
+          </aside>
+          <div class="catalog-products">
+            <div class="products-grid" data-products-container data-category="audio"></div>
+            <p class="catalog-empty" data-category-empty hidden>В этой категории товары не найдены. Измените фильтры.</p>
+          </div>
+        </div>
+        <section class="section category-comparison">
+          <h3>Сравнение моделей</h3>
+          <div class="table-wrap">
+            <table class="spec-table">
+              <caption>Наушники: основные параметры и цены</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Модель</th>
+                  <th scope="col">Тип</th>
+                  <th scope="col">Автономность</th>
+                  <th scope="col">Цена</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row"><a href="product-sony-wh1000xm4.html">Sony WH-1000XM4</a></th><td>Полноразмерные, беспроводные</td><td>До 30 часов с шумоподавлением</td><td>19 990 ₽</td></tr>
+                <tr><th scope="row"><a href="product-bose-qc25.html">Bose QuietComfort 25</a></th><td>Полноразмерные, проводные</td><td>До 35 часов от батарейки AAA</td><td>8 990 ₽</td></tr>
+                <tr><th scope="row"><a href="product-airpods-max.html">Apple AirPods Max (Lightning)</a></th><td>Полноразмерные, беспроводные</td><td>До 20 часов работы</td><td>39 990 ₽</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+      <section class="catalog-category section" id="notebooks">
+        <div class="section__heading">
+          <h2>Ноутбуки</h2>
+          <p class="muted">3 модели</p>
+        </div>
+        <div class="catalog-layout">
+          <aside class="catalog-filters" aria-labelledby="notebooks-filter-title">
+            <h3 class="catalog-filters__title" id="notebooks-filter-title">Фильтры</h3>
+            <div class="filters-form">
+              <fieldset class="filters-form__group">
+                <legend class="filters-form__legend">Цена, ₽</legend>
+                <div class="filters-form__range">
+                  <div>
+                    <label class="filters-form__label" for="notebooks-price-from">От</label>
+                    <input class="filters-form__input" id="notebooks-price-from" name="price-from" type="number" min="0" placeholder="0">
+                  </div>
+                  <div>
+                    <label class="filters-form__label" for="notebooks-price-to">До</label>
+                    <input class="filters-form__input" id="notebooks-price-to" name="price-to" type="number" min="0" placeholder="100000">
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset class="filters-form__group">
+                <legend class="filters-form__legend">Диагональ экрана</legend>
+                <div class="filters-form__options">
+                  <div class="filters-form__option">
+                    <input id="notebooks-screen-compact" name="screen-size" type="checkbox" value="compact">
+                    <label for="notebooks-screen-compact">До 14 дюймов</label>
+                  </div>
+                  <div class="filters-form__option">
+                    <input id="notebooks-screen-large" name="screen-size" type="checkbox" value="14">
+                    <label for="notebooks-screen-large">14 дюймов</label>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset class="filters-form__group">
+                <legend class="filters-form__legend">Оперативная память</legend>
+                <div class="filters-form__options">
+                  <div class="filters-form__option">
+                    <input id="notebooks-ram-16" name="ram" type="checkbox" value="8">
+                    <label for="notebooks-ram-16">8 ГБ</label>
+                  </div>
+                  <div class="filters-form__option">
+                    <input id="notebooks-ram-32" name="ram" type="checkbox" value="16">
+                    <label for="notebooks-ram-32">16 ГБ</label>
+                  </div>
+                </div>
+              </fieldset>
+                            <fieldset class="filters-form__group">
+                <legend class="filters-form__legend">Встроенная память</legend>
+                <div class="filters-form__options">
+                  <div class="filters-form__option">
+                    <input id="notebooks-storage-256" name="storage" type="checkbox" value="256">
+                    <label for="notebooks-storage-256">256 ГБ</label>
+                  </div>
+                  <div class="filters-form__option">
+                    <input id="notebooks-storage-512" name="storage" type="checkbox" value="512">
+                    <label for="notebooks-storage-512">512 ГБ</label>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset class="filters-form__group">
+                <legend class="filters-form__legend">Процессор</legend>
+                <div class="filters-form__options">
+                  <div class="filters-form__option">
+                    <input id="notebooks-chip-m1-pro" name="processor" type="checkbox" value="m1-pro">
+                    <label for="notebooks-chip-m1-pro">Apple M1 Pro</label>
+                  </div>
+                  <div class="filters-form__option">
+                    <input id="notebooks-chip-m2" name="processor" type="checkbox" value="m2">
+                    <label for="notebooks-chip-m2">Apple M2</label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </aside>
+          <div class="catalog-products">
+            <div class="products-grid" data-products-container data-category="notebooks"></div>
+            <p class="catalog-empty" data-category-empty hidden>В этой категории товары не найдены. Измените фильтры.</p>
+          </div>
+        </div>
+        <section class="section category-comparison">
+          <h3>Сравнение моделей</h3>
+          <div class="table-wrap">
+            <table class="spec-table">
+              <caption>Ноутбуки: основные параметры и цены</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Модель</th>
+                  <th scope="col">Экран</th>
+                  <th scope="col">Память</th>
+                  <th scope="col">Цена</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row"><a href="product.html">MacBook Air 13″ M2 8/256 ГБ</a></th><td>13,6″, Liquid Retina, 2560 × 1664</td><td>8 ГБ / SSD 256 ГБ</td><td>79 990 ₽</td></tr>
+                <tr><th scope="row"><a href="product-macbook-pro-14.html">MacBook Pro 14″ M1 Pro 16/512 ГБ</a></th><td>14,2″, Liquid Retina XDR, 3024 × 1964</td><td>16 ГБ / SSD 512 ГБ</td><td>119 990 ₽</td></tr>
+                <tr><th scope="row"><a href="product-macbook-air-16gb.html">MacBook Air 13″ M2 16/512 ГБ</a></th><td>13,6″, Liquid Retina, 2560 × 1664</td><td>16 ГБ / SSD 512 ГБ</td><td>99 990 ₽</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </main>
-
     <footer class="site-footer">
       <div class="container">
         <div class="site-footer__inner">

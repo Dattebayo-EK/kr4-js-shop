@@ -20,7 +20,8 @@ window.DoraShop.products = [
     height: 561,
     page: 'product-pixel-7-pro.html',
     description: 'Смартфон Google с камерой 50 Мп, экраном 120 Гц и чипом Tensor G2.',
-    specs: ['6,7″, LTPO OLED', '120 Гц, Google Tensor G2', '12 ГБ / 128 ГБ']
+    specs: ['6,7″, LTPO OLED, 3120 × 1440', '120 Гц, Google Tensor G2', '12 ГБ / 128 ГБ'],
+    filterTags: ['phones-size-large', 'phones-storage-128', 'phones-brand-google', 'phones-os-android', 'phones-feature-5g', 'phones-feature-nfc']
   },
   {
     id: 2,
@@ -39,7 +40,8 @@ window.DoraShop.products = [
     height: 1200,
     page: 'product-iphone-13-pro.html',
     description: 'Компактный iPhone с OLED-экраном ProMotion и тройной камерой.',
-    specs: ['6,1″, OLED', 'ProMotion до 120 Гц', 'Накопитель 128 ГБ']
+    specs: ['6,1″, OLED, 2532 × 1170', 'ProMotion до 120 Гц, Apple A15', 'Накопитель 128 ГБ'],
+    filterTags: ['phones-size-small', 'phones-storage-128', 'phones-brand-apple', 'phones-os-ios', 'phones-feature-5g', 'phones-feature-nfc']
   },
   {
     id: 3,
@@ -58,7 +60,8 @@ window.DoraShop.products = [
     height: 713,
     page: 'product-galaxy-s23-ultra.html',
     description: 'Большой AMOLED-экран, камера 200 Мп и встроенное перо S Pen.',
-    specs: ['6,8″, Dynamic AMOLED 2X', 'Snapdragon 8 Gen 2', '12 ГБ / 512 ГБ']
+    specs: ['6,8″, Dynamic AMOLED 2X, 3088 × 1440', '120 Гц, Snapdragon 8 Gen 2', '12 ГБ / 512 ГБ'],
+    filterTags: ['phones-size-large', 'phones-storage-512', 'phones-brand-samsung', 'phones-os-android', 'phones-feature-5g', 'phones-feature-nfc']
   },
   {
     id: 4,
@@ -77,7 +80,8 @@ window.DoraShop.products = [
     height: 720,
     page: 'product-sony-wh1000xm4.html',
     description: 'Беспроводные наушники с активным шумоподавлением и складной конструкцией.',
-    specs: ['Полноразмерные', 'Bluetooth 5.0', 'До 30 часов работы']
+    specs: ['Полноразмерные, беспроводные', 'Bluetooth 5.0 и кабель 3,5 мм', 'До 30 часов с шумоподавлением'],
+    filterTags: ['audio-wireless', 'audio-battery', 'audio-brand-sony', 'audio-noise-cancelling', 'audio-microphone']
   },
   {
     id: 5,
@@ -96,7 +100,8 @@ window.DoraShop.products = [
     height: 720,
     page: 'product-bose-qc25.html',
     description: 'Проводные полноразмерные наушники с активным шумоподавлением.',
-    specs: ['Проводные', 'Кабель 3,5 мм', 'До 35 часов от AAA']
+    specs: ['Полноразмерные, проводные', 'Кабель 3,5 мм', 'До 35 часов от батарейки AAA'],
+    filterTags: ['audio-wired', 'audio-aaa', 'audio-brand-bose', 'audio-noise-cancelling', 'audio-microphone']
   },
   {
     id: 6,
@@ -114,8 +119,9 @@ window.DoraShop.products = [
     width: 960,
     height: 720,
     page: 'product-airpods-max.html',
-    description: 'Полноразмерные наушники Apple с шумоподавлением и пространственным аудио.',
-    specs: ['Беспроводные', 'Активное шумоподавление', 'До 20 часов работы']
+    description: 'Полноразмерные наушники Apple с активным шумоподавлением и пространственным аудио.',
+    specs: ['Полноразмерные, беспроводные', 'Bluetooth 5.0, активное шумоподавление', 'До 20 часов работы'],
+    filterTags: ['audio-wireless', 'audio-battery', 'audio-brand-apple', 'audio-noise-cancelling', 'audio-microphone']
   },
   {
     id: 7,
@@ -133,8 +139,9 @@ window.DoraShop.products = [
     width: 960,
     height: 1440,
     page: 'product.html',
-    description: 'Лёгкий ноутбук на Apple M2 с бесшумной системой охлаждения.',
-    specs: ['13,6″, Liquid Retina', 'Apple M2', '8 ГБ / SSD 256 ГБ']
+    description: 'Лёгкий ноутбук с чипом M2 для работы, учёбы и поездок.',
+    specs: ['13,6″, Liquid Retina, 2560 × 1664', 'Apple M2, 8 ядер', '8 ГБ / SSD 256 ГБ'],
+    filterTags: ['notebooks-screen-compact', 'notebooks-ram-16', 'notebooks-storage-256', 'notebooks-chip-m2']
   },
   {
     id: 8,
@@ -152,8 +159,9 @@ window.DoraShop.products = [
     width: 960,
     height: 640,
     page: 'product-macbook-pro-14.html',
-    description: 'Профессиональный ноутбук с экраном Liquid Retina XDR и чипом M1 Pro.',
-    specs: ['14,2″, Liquid Retina XDR', 'Apple M1 Pro', '16 ГБ / SSD 512 ГБ']
+    description: 'Производительный ноутбук с экраном Liquid Retina XDR и чипом M1 Pro.',
+    specs: ['14,2″, Liquid Retina XDR, 3024 × 1964', 'Apple M1 Pro, 8 ядер', '16 ГБ / SSD 512 ГБ'],
+    filterTags: ['notebooks-screen-large', 'notebooks-ram-32', 'notebooks-storage-512', 'notebooks-chip-m1-pro']
   },
   {
     id: 9,
@@ -171,8 +179,9 @@ window.DoraShop.products = [
     width: 960,
     height: 1440,
     page: 'product-macbook-air-16gb.html',
-    description: 'Версия MacBook Air с увеличенной памятью для многозадачной работы.',
-    specs: ['13,6″, Liquid Retina', 'Apple M2', '16 ГБ / SSD 512 ГБ']
+    description: 'Тот же лёгкий корпус MacBook Air с увеличенной памятью и накопителем.',
+    specs: ['13,6″, Liquid Retina, 2560 × 1664', 'Apple M2, 8 ядер', '16 ГБ / SSD 512 ГБ'],
+    filterTags: ['notebooks-screen-compact', 'notebooks-ram-32', 'notebooks-storage-512', 'notebooks-chip-m2']
   }
 ];
 

@@ -18,24 +18,17 @@
   const promoInput = document.querySelector('#promo-code');
   const promoMessage = document.querySelector('[data-promo-message]');
   const clearButton = document.querySelector('[data-action="clear-cart"]');
-  let promoPercent = 0;
+  let promoPercent = shop.storage.getPromoCode() === 'DORA10' ? 10 : 0;
+  if (promoPercent > 0) {
+    promoInput.value = 'DORA10';
+    promoMessage.textContent = 'Промокод применён: скидка 10%.';
+  }
 
   function getDetailedCart() {
     return shop.storage.getCart().map((item) => {
       const product = shop.findProductById(item.id);
       return product ? { product, quantity: item.quantity } : null;
     }).filter(Boolean);
-  }
-
-  function createButton(text, action, productId, label) {
-    const button = document.createElement('button');
-    button.classList.add('cart-item__control');
-    button.type = 'button';
-    button.textContent = text;
-    button.dataset.action = action;
-    button.dataset.productId = String(productId);
-    button.setAttribute('aria-label', label);
-    return button;
   }
 
   function createCartItem(entry) {
@@ -66,19 +59,29 @@
     status.classList.add('muted');
     status.textContent = product.isAvailable ? 'В наличии' : 'Нет в наличии';
 
-    const controls = document.createElement('div');
-    controls.classList.add('cart-item__controls');
-    controls.append(createButton('−', 'decrease', product.id, `Уменьшить количество ${product.title}`));
-    const quantityOutput = document.createElement('output');
-    quantityOutput.classList.add('cart-item__quantity-value');
-    quantityOutput.textContent = String(quantity);
-    quantityOutput.setAttribute('aria-label', `Количество: ${quantity}`);
-    controls.append(quantityOutput);
-    controls.append(createButton('+', 'increase', product.id, `Увеличить количество ${product.title}`));
-    const removeButton = createButton('Удалить', 'remove', product.id, `Удалить ${product.title} из корзины`);
-    removeButton.classList.add('cart-item__remove');
-    controls.append(removeButton);
-    info.append(title, status, controls);
+    const quantityId = `quantity-${product.slug}`;
+    const quantityLabel = document.createElement('label');
+    quantityLabel.classList.add('cart-item__quantity-label');
+    quantityLabel.htmlFor = quantityId;
+    quantityLabel.textContent = 'Количество';
+    const quantityInput = document.createElement('input');
+    quantityInput.classList.add('cart-item__quantity');
+    quantityInput.id = quantityId;
+    quantityInput.name = quantityId;
+    quantityInput.type = 'number';
+    quantityInput.min = '1';
+    quantityInput.max = '99';
+    quantityInput.value = String(quantity);
+    quantityInput.dataset.productId = String(product.id);
+
+    const removeButton = document.createElement('button');
+    removeButton.classList.add('cart-item__control', 'cart-item__remove');
+    removeButton.type = 'button';
+    removeButton.dataset.action = 'remove';
+    removeButton.dataset.productId = String(product.id);
+    removeButton.setAttribute('aria-label', `Удалить ${product.title} из корзины`);
+    removeButton.textContent = 'Удалить';
+    info.append(title, status, quantityLabel, quantityInput, removeButton);
 
     const price = document.createElement('p');
     price.classList.add('cart-item__price');
@@ -96,6 +99,12 @@
 
   function renderCart() {
     const items = getDetailedCart();
+    if (items.length === 0 && promoPercent > 0) {
+      promoPercent = 0;
+      shop.storage.savePromoCode('');
+      promoInput.value = '';
+      promoMessage.textContent = '';
+    }
     const totals = calculateTotals(items);
     const fragment = document.createDocumentFragment();
     items.forEach((item) => fragment.append(createCartItem(item)));
@@ -110,19 +119,34 @@
     discountRow.hidden = totals.discount === 0;
     discountOutput.textContent = `−${shop.formatPrice(totals.discount)}`;
     totalOutput.textContent = shop.formatPrice(totals.total);
-    assuranceCount.textContent = `${totals.count} ${totals.count === 1 ? 'товар' : 'товара'}`;
+    const lastTwoDigits = totals.count % 100;
+    const lastDigit = totals.count % 10;
+    const word = lastTwoDigits >= 11 && lastTwoDigits <= 14
+      ? 'товаров'
+      : lastDigit === 1 ? 'товар' : (lastDigit >= 2 && lastDigit <= 4 ? 'товара' : 'товаров');
+    assuranceCount.textContent = `${totals.count} ${word}`;
   }
 
-  function updateQuantity(productId, delta) {
+  function updateQuantity(productId, value) {
     const cart = shop.storage.getCart();
     const item = cart.find((entry) => entry.id === Number(productId));
     if (!item) {
       return;
     }
-    item.quantity = Math.max(1, Math.min(10, item.quantity + delta));
+    if (!Number.isInteger(value)) {
+      renderCart();
+      return;
+    }
+    item.quantity = Math.max(1, Math.min(99, value));
     shop.storage.saveCart(cart);
     renderCart();
   }
+
+  cartContainer.addEventListener('change', (event) => {
+    if (event.target.matches('input.cart-item__quantity[data-product-id]')) {
+      updateQuantity(event.target.dataset.productId, Number(event.target.value));
+    }
+  });
 
   cartContainer.addEventListener('click', (event) => {
     const button = event.target.closest('button[data-action]');
@@ -130,12 +154,6 @@
       return;
     }
     const id = Number(button.dataset.productId);
-    if (button.dataset.action === 'increase') {
-      updateQuantity(id, 1);
-    }
-    if (button.dataset.action === 'decrease') {
-      updateQuantity(id, -1);
-    }
     if (button.dataset.action === 'remove') {
       const cart = shop.storage.getCart().filter((item) => item.id !== id);
       shop.storage.saveCart(cart);
@@ -146,6 +164,7 @@
   clearButton.addEventListener('click', () => {
     shop.storage.saveCart([]);
     promoPercent = 0;
+    shop.storage.savePromoCode('');
     promoMessage.textContent = '';
     promoInput.value = '';
     renderCart();
@@ -156,9 +175,11 @@
     const code = promoInput.value.trim().toUpperCase();
     if (code === 'DORA10') {
       promoPercent = 10;
+      shop.storage.savePromoCode('DORA10');
       promoMessage.textContent = 'Промокод применён: скидка 10%.';
     } else {
       promoPercent = 0;
+      shop.storage.savePromoCode('');
       promoMessage.textContent = 'Промокод не найден. Попробуйте DORA10.';
     }
     renderCart();

@@ -5,6 +5,12 @@ window.DoraShop = window.DoraShop || {};
 (function createStorageApi(shop) {
   const CART_KEY = 'dora-shop-cart';
   const FAVORITES_KEY = 'dora-shop-favorites';
+  const PROMO_KEY = 'dora-shop-promo';
+  const START_CART = [
+    { id: 7, quantity: 1 },
+    { id: 1, quantity: 1 },
+    { id: 4, quantity: 1 }
+  ];
 
   function read(key, fallback) {
     try {
@@ -27,8 +33,23 @@ window.DoraShop = window.DoraShop || {};
   }
 
   function getCart() {
-    const cart = read(CART_KEY, []);
-    return Array.isArray(cart) ? cart : [];
+    let firstVisit = false;
+    try {
+      firstVisit = localStorage.getItem(CART_KEY) === null;
+    } catch (error) {
+      console.warn('Не удалось проверить корзину в localStorage.', error);
+    }
+    const cart = firstVisit ? START_CART : read(CART_KEY, []);
+    if (firstVisit) {
+      write(CART_KEY, cart);
+    }
+    if (!Array.isArray(cart)) {
+      return [];
+    }
+    return cart.filter((item) => (
+      item && Number.isInteger(item.id) && shop.findProductById(item.id)?.isAvailable &&
+      Number.isInteger(item.quantity) && item.quantity > 0
+    )).map((item) => ({ id: item.id, quantity: Math.min(item.quantity, 99) }));
   }
 
   function saveCart(cart) {
@@ -38,10 +59,14 @@ window.DoraShop = window.DoraShop || {};
 
   function addToCart(productId) {
     const id = Number(productId);
+    const product = shop.findProductById(id);
     const cart = getCart();
+    if (!product || !product.isAvailable) {
+      return cart;
+    }
     const item = cart.find((entry) => entry.id === id);
     if (item) {
-      item.quantity = Math.min(item.quantity + 1, 10);
+      item.quantity = Math.min(item.quantity + 1, 99);
     } else {
       cart.push({ id, quantity: 1 });
     }
@@ -49,14 +74,46 @@ window.DoraShop = window.DoraShop || {};
     return cart;
   }
 
+  function hasCartItem(productId) {
+    const id = Number(productId);
+    return getCart().some((item) => Number(item.id) === id);
+  }
+
+  function toggleCartItem(productId) {
+    const id = Number(productId);
+    const cart = getCart();
+    const itemIndex = cart.findIndex((item) => Number(item.id) === id);
+
+    if (itemIndex !== -1) {
+      cart.splice(itemIndex, 1);
+      saveCart(cart);
+      return false;
+    }
+
+    const product = shop.findProductById(id);
+    if (!product || !product.isAvailable) {
+      return false;
+    }
+
+    cart.push({ id, quantity: 1 });
+    saveCart(cart);
+    return true;
+  }
+
   function getFavorites() {
     const favorites = read(FAVORITES_KEY, []);
-    return Array.isArray(favorites) ? favorites.map(Number) : [];
+    if (!Array.isArray(favorites)) {
+      return [];
+    }
+    return [...new Set(favorites.map(Number).filter((id) => Number.isInteger(id) && shop.findProductById(id)))];
   }
 
   function toggleFavorite(productId) {
     const id = Number(productId);
     const favorites = getFavorites();
+    if (!shop.findProductById(id)) {
+      return false;
+    }
     const index = favorites.indexOf(id);
     if (index === -1) {
       favorites.push(id);
@@ -68,5 +125,14 @@ window.DoraShop = window.DoraShop || {};
     return favorites.includes(id);
   }
 
-  shop.storage = { getCart, saveCart, addToCart, getFavorites, toggleFavorite };
+  function getPromoCode() {
+    return read(PROMO_KEY, '') === 'DORA10' ? 'DORA10' : '';
+  }
+
+  function savePromoCode(code) {
+    write(PROMO_KEY, code === 'DORA10' ? 'DORA10' : '');
+    document.dispatchEvent(new CustomEvent('dora:promo-updated'));
+  }
+
+  shop.storage = { getCart, saveCart, addToCart, hasCartItem, toggleCartItem, getFavorites, toggleFavorite, getPromoCode, savePromoCode };
 })(window.DoraShop);

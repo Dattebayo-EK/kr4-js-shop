@@ -12,6 +12,101 @@
   const phoneInput = form.querySelector('#page-phone');
   const agreementInput = form.querySelector('#page-agreement');
   const formMessage = form.querySelector('.form-message');
+  const orderHistoryContainer = document.querySelector('[data-order-history]');
+  const orderHistoryEmpty = document.querySelector('[data-order-history-empty]');
+  const urlParams = new URLSearchParams(window.location.search);
+  let initialSelection = urlParams.get('product') || (urlParams.get('source') === 'cart' ? 'cart' : '');
+  const sampleOrders = [
+    { number: 'DT-1042', createdAt: '2026-09-22', delivery: 'pickup', items: [{ id: 8, price: 119990, quantity: 1 }], status: 'Отменён' },
+    { number: 'DT-1037', createdAt: '2026-09-18', delivery: 'pickup', items: [{ id: 2, price: 44990, quantity: 1 }], status: 'Получен' },
+    { number: 'DT-1026', createdAt: '2026-09-10', delivery: 'pickup', items: [{ id: 4, price: 19990, quantity: 1 }], status: 'Получен' }
+  ];
+
+  function getSavedOrders() {
+    try {
+      const savedOrders = JSON.parse(localStorage.getItem('dora-shop-orders') || '[]');
+      return Array.isArray(savedOrders)
+        ? savedOrders.filter((order) => order && typeof order === 'object')
+        : [];
+    } catch (error) {
+      console.warn('Не удалось прочитать историю заявок.', error);
+      return [];
+    }
+  }
+
+  function createTextElement(tagName, className, text) {
+    const element = document.createElement(tagName);
+    if (className) {
+      className.split(/\s+/).filter(Boolean).forEach((classToken) => element.classList.add(classToken));
+    }
+    element.textContent = text;
+    return element;
+  }
+
+  function renderOrderHistory() {
+    if (!orderHistoryContainer || !orderHistoryEmpty) {
+      return;
+    }
+
+    const savedOrders = getSavedOrders();
+    const orders = savedOrders.length > 0 ? savedOrders : sampleOrders;
+    const fragment = document.createDocumentFragment();
+    orders.forEach((order) => {
+      const items = Array.isArray(order.items)
+        ? order.items.filter((item) => item && typeof item === 'object')
+        : [];
+      const itemCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+      const subtotal = items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0);
+      const discount = Math.round(subtotal * (Number(order.discountPercent) || 0) / 100);
+      const total = subtotal - discount;
+      const article = document.createElement('article');
+      article.classList.add('order-history__item');
+
+      const heading = document.createElement('div');
+      heading.classList.add('order-history__heading');
+      const statusClass = order.status === 'Отменён' ? 'order-status--muted' : 'order-status--success';
+      heading.append(
+        createTextElement('h3', '', `Заявка №${order.number || '—'}`),
+        createTextElement('span', `order-status ${statusClass}`, order.status || 'Сохранена локально')
+      );
+
+      const createdAt = new Date(order.createdAt);
+      const date = Number.isNaN(createdAt.getTime())
+        ? 'Дата не указана'
+        : new Intl.DateTimeFormat('ru-RU').format(createdAt);
+      const deliveryLabels = { pickup: 'Самовывоз', courier: 'Курьерская доставка', point: 'Пункт выдачи' };
+      article.append(heading, createTextElement('p', 'muted', `${date} · ${deliveryLabels[order.delivery] || 'Способ получения не указан'}`));
+
+      if (items.length > 0) {
+        if (items.length === 1) {
+          const product = shop.findProductById(items[0].id);
+          const titleLink = createTextElement('a', '', product ? product.title : 'Товар');
+          titleLink.href = product ? product.page : 'catalog.html';
+          article.append(titleLink);
+        } else {
+          const itemList = document.createElement('ul');
+          items.forEach((item) => {
+            const product = shop.findProductById(item.id);
+            const line = document.createElement('li');
+            line.textContent = `${product ? product.title : 'Товар'} — ${Number(item.quantity) || 0} шт.`;
+            itemList.append(line);
+          });
+          article.append(itemList);
+        }
+        article.append(createTextElement('p', 'order-history__price', `${itemCount} шт. · ${shop.formatPrice(total)}`));
+      } else {
+        article.append(createTextElement('p', '', order.product || 'Состав заявки не указан'));
+      }
+
+      const contactLink = createTextElement('a', '', order.status ? 'Обратиться по заявке →' : 'Посмотреть контакты →');
+      contactLink.href = 'contacts.html#feedback';
+      article.append(contactLink);
+      fragment.append(article);
+    });
+
+    orderHistoryContainer.replaceChildren(fragment);
+    orderHistoryEmpty.hidden = orders.length > 0;
+  }
 
   function getErrorElement(input) {
     return form.querySelector(`[data-error-for="${input.id}"]`);
@@ -34,9 +129,66 @@
     input.removeAttribute('aria-invalid');
   }
 
+  function getCartItems() {
+    return shop.storage.getCart().map((item) => {
+      const product = shop.findProductById(item.id);
+      return product ? { id: product.id, title: product.title, price: product.price, quantity: item.quantity } : null;
+    }).filter(Boolean);
+  }
+
+  function getSelectedItems() {
+    if (productInput.value === 'cart') {
+      return getCartItems();
+    }
+    const product = shop.products.find((item) => item.slug === productInput.value && item.isAvailable);
+    return product
+      ? [{ id: product.id, title: product.title, price: product.price, quantity: 1 }]
+      : [];
+  }
+
+  function updateProductOptions() {
+    const currentValue = productInput.value || initialSelection;
+    const selectedProduct = shop.products.find((product) => (
+      product.slug === currentValue || String(product.id) === currentValue
+    ));
+    const wantedValue = selectedProduct ? selectedProduct.slug : currentValue;
+    initialSelection = '';
+    productInput.replaceChildren();
+
+    const placeholder = new Option('Выберите товар', '');
+    productInput.append(placeholder);
+    const productOrder = [7, 1, 4, 8, 9, 2, 3, 5, 6];
+    productOrder.forEach((id) => {
+      const product = shop.findProductById(id);
+      if (!product) {
+        return;
+      }
+      const option = new Option(`${product.title} — ${shop.formatPrice(product.price)}`, product.slug);
+      option.disabled = !product.isAvailable;
+      productInput.append(option);
+    });
+
+    const cartItems = getCartItems();
+    const count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const discount = shop.storage.getPromoCode() === 'DORA10' ? Math.round(subtotal * 0.1) : 0;
+    const cartLabel = count > 0
+      ? `Корзина: ${count} шт. — ${shop.formatPrice(subtotal - discount)}`
+      : 'Корзина пуста';
+    const cartOption = new Option(cartLabel, 'cart');
+    cartOption.disabled = count === 0;
+    productInput.append(cartOption);
+
+    const matchingOption = [...productInput.options].find((option) => option.value === wantedValue && !option.disabled);
+    productInput.value = matchingOption ? wantedValue : '';
+  }
+
   function validateProduct() {
-    if (!productInput.value) {
-      showError(productInput, 'Выберите товар или корзину.');
+    if (getSelectedItems().length === 0) {
+      const message = productInput.value === 'cart'
+        ? 'Добавьте товары в корзину перед оформлением заявки.'
+        : 'Выберите доступный товар или корзину.';
+      showError(productInput, message);
       return false;
     }
     clearError(productInput);
@@ -65,8 +217,9 @@
   }
 
   function validatePhone() {
-    const digits = phoneInput.value.replace(/\D/g, '');
-    if (digits.length < 10 || digits.length > 11) {
+    const value = phoneInput.value.trim();
+    const digits = value.replace(/\D/g, '');
+    if (!/^[0-9+()\s-]+$/.test(value) || digits.length < 10 || digits.length > 11) {
       showError(phoneInput, 'Введите телефон из 10–11 цифр.');
       return false;
     }
@@ -76,58 +229,22 @@
 
   function validateAgreement() {
     if (!agreementInput.checked) {
-      showError(agreementInput, 'Необходимо согласие на обработку данных.');
+      showError(agreementInput, 'Подтвердите, что заявка учебная.');
       return false;
     }
     clearError(agreementInput);
     return true;
   }
 
-  function populateProducts() {
-    const selectedValue = productInput.value;
-    productInput.textContent = '';
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = 'Выберите товар';
-    productInput.append(placeholder);
-
-    shop.products.filter((product) => product.isAvailable).forEach((product) => {
-      const option = document.createElement('option');
-      option.value = String(product.id);
-      option.textContent = `${product.title} — ${shop.formatPrice(product.price)}`;
-      productInput.append(option);
-    });
-
-    const cart = shop.storage.getCart();
-    if (cart.length > 0) {
-      const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-      const cartTotal = cart.reduce((sum, item) => {
-        const product = shop.findProductById(item.id);
-        return product ? sum + product.price * item.quantity : sum;
-      }, 0);
-      const option = document.createElement('option');
-      option.value = 'cart';
-      option.textContent = `Корзина: ${cartCount} шт. — ${shop.formatPrice(cartTotal)}`;
-      productInput.append(option);
-    }
-
-    const queryProduct = new URLSearchParams(window.location.search).get('product');
-    if (queryProduct && shop.findProductById(queryProduct)) {
-      productInput.value = queryProduct;
-    } else if (new URLSearchParams(window.location.search).get('source') === 'cart' && cart.length > 0) {
-      productInput.value = 'cart';
-    } else if ([...productInput.options].some((option) => option.value === selectedValue)) {
-      productInput.value = selectedValue;
-    }
-  }
-
   function saveOrder(order) {
     try {
-      const savedOrders = JSON.parse(localStorage.getItem('dora-shop-orders') || '[]');
+      const savedOrders = getSavedOrders();
       savedOrders.unshift(order);
       localStorage.setItem('dora-shop-orders', JSON.stringify(savedOrders.slice(0, 10)));
+      return true;
     } catch (error) {
       console.warn('Не удалось сохранить заявку.', error);
+      return false;
     }
   }
 
@@ -151,24 +268,38 @@
     }
 
     const orderNumber = `DT-${Date.now().toString().slice(-6)}`;
+    const selectedItems = getSelectedItems();
+    const isCartOrder = productInput.value === 'cart';
     const order = {
       number: orderNumber,
-      product: productInput.value,
-      name: nameInput.value.trim(),
-      email: emailInput.value.trim(),
-      phone: phoneInput.value.trim(),
+      items: selectedItems,
+      discountPercent: isCartOrder && shop.storage.getPromoCode() === 'DORA10' ? 10 : 0,
       delivery: form.querySelector('#page-delivery').value,
       createdAt: new Date().toISOString()
     };
-    saveOrder(order);
-    if (productInput.value === 'cart') {
-      shop.storage.saveCart([]);
+    if (!saveOrder(order)) {
+      formMessage.textContent = 'Не удалось сохранить заявку. Проверьте доступность хранилища и попробуйте ещё раз.';
+      formMessage.classList.remove('form-message--success');
+      return;
     }
-    formMessage.textContent = `Заявка ${orderNumber} принята. Мы свяжемся с вами для подтверждения.`;
+    if (isCartOrder) {
+      shop.storage.saveCart([]);
+      shop.storage.savePromoCode('');
+    }
+    renderOrderHistory();
+    formMessage.textContent = `Учебная заявка ${orderNumber} сохранена в этом браузере. На сервер данные не отправлены.`;
     formMessage.classList.add('form-message--success');
     form.reset();
-    populateProducts();
+    updateProductOptions();
   });
 
-  populateProducts();
+  document.addEventListener('dora:cart-updated', updateProductOptions);
+  document.addEventListener('dora:promo-updated', updateProductOptions);
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'dora-shop-cart' || event.key === 'dora-shop-promo') {
+      updateProductOptions();
+    }
+  });
+  updateProductOptions();
+  renderOrderHistory();
 })(window.DoraShop || {});

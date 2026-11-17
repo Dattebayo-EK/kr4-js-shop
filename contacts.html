@@ -11,6 +11,7 @@
     <script src="js/data.js" defer></script>
     <script src="js/storage.js" defer></script>
     <script src="js/main.js" defer></script>
+    <script src="js/contact.js" defer></script>
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -54,7 +55,7 @@
       </section>
       <aside class="service-bar" aria-label="Срок ответа">
         <span class="service-bar__signal" aria-hidden="true"></span>
-        <div><strong>Служба поддержки на связи</strong><span>Обычно отвечаем в течение рабочего дня</span></div>
+        <div><strong>Учебная форма обращения</strong><span>Данные не отправляются на сервер</span></div>
         <a href="#feedback">Написать по заказу</a>
       </aside>
       <section class="contact-grid section" aria-label="Контактная информация">
@@ -86,7 +87,7 @@
       </section>
       <section class="request-panel section" id="request-form" aria-labelledby="request-form-title">
         <h2 id="request-form-title">Обращение по заказу</h2>
-        <form class="order-form" action="contacts.html#request-form" method="get">
+        <form class="order-form" action="#request-form" method="post" data-contact-form>
           <p class="order-form__note">Поля со звёздочкой обязательны.</p>
           <div class="order-form__grid">
             <div class="order-form__field">
