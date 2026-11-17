@@ -305,8 +305,11 @@
         if (!product.isAvailable) {
           return;
         }
+        const alreadyInCart = shop.storage.hasCartItem(product.id);
         shop.storage.addToCart(product.id);
-        showMessage(`${product.title} добавлен в корзину.`);
+        showMessage(alreadyInCart
+          ? `${product.title} уже находится в корзине.`
+          : `${product.title} добавлен в корзину.`);
         return;
       }
       if (control.dataset.action === 'toggle-favorite') {

@@ -66,10 +66,9 @@ window.DoraShop = window.DoraShop || {};
     }
     const item = cart.find((entry) => entry.id === id);
     if (item) {
-      item.quantity = Math.min(item.quantity + 1, 99);
-    } else {
-      cart.push({ id, quantity: 1 });
+      return cart;
     }
+    cart.push({ id, quantity: 1 });
     saveCart(cart);
     return cart;
   }
