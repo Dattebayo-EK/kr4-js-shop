@@ -2,16 +2,6 @@
 
 Многостраничный учебный интернет-магазин. Контрольная работа №4 продолжает адаптивный сайт КР3: сохранены его страницы и визуальная основа, а каталог, корзина, избранное и формы дополнены JavaScript.
 
-### Как включить GitHub Pages
-
-1. Откройте репозиторий [Dattebayo-EK/kr4-js-shop](https://github.com/Dattebayo-EK/kr4-js-shop).
-2. Перейдите в **Settings → Pages**.
-3. В разделе **Build and deployment** выберите **Deploy from a branch**.
-4. Укажите ветку **main** и папку **/(root)**, затем нажмите **Save**.
-5. Дождитесь завершения публикации в разделе Pages и откройте ссылку выше.
-
-Сборка и установка зависимостей не нужны: GitHub Pages публикует HTML, CSS, JavaScript и изображения прямо из корня репозитория. Если после публикации видна старая версия, проверьте последний запуск публикации в **Actions**, затем обновите страницу без кэша.
-
 ## Возможности
 
 - каталог из девяти товаров с поиском, сортировкой и фильтрами;
@@ -89,7 +79,6 @@ python -m http.server 8000
 ## Репозиторий
 
 GitHub: [github.com/Dattebayo-EK/kr4-js-shop](https://github.com/Dattebayo-EK/kr4-js-shop)
-
 GitHub Pages: [dattebayo-ek.github.io/kr4-js-shop](https://dattebayo-ek.github.io/kr4-js-shop/)
 
 ## Автор
