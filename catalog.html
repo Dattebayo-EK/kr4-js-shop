@@ -49,26 +49,18 @@
       <nav class="breadcrumbs" aria-label="Хлебные крошки">
         <a href="index.html">Главная</a>
         <span class="breadcrumbs__current" aria-current="page">Каталог</span>
-        <button class="catalog-tools-button" type="button" data-action="open-catalog-dialog">Поиск и сортировка</button>
       </nav>
       <section class="page-heading">
         <h1>Выберите свою технику</h1>
       </section>
 
-      <dialog class="catalog-dialog" id="catalog-dialog" aria-labelledby="catalog-controls-title">
-      <section class="catalog-controls" aria-labelledby="catalog-controls-title">
-        <div class="section__heading">
-          <h2 id="catalog-controls-title">Управление каталогом</h2>
-          <div class="catalog-dialog__actions">
-            <button class="button button--secondary" type="button" data-action="reset-catalog">Сбросить</button>
-            <button class="button button--secondary" type="button" data-action="close-catalog-dialog" aria-label="Закрыть поиск и сортировку">Закрыть</button>
-          </div>
-        </div>
+      <div class="catalog-controls__group catalog-search" role="search">
+        <label for="catalog-search">Поиск товара</label>
+        <input class="order-form__input" id="catalog-search" type="search" placeholder="Например, MacBook или Sony" autocomplete="off">
+      </div>
+
+      <section class="catalog-controls" aria-label="Фильтры и сортировка">
         <div class="catalog-controls__grid">
-          <div class="catalog-controls__group">
-            <label for="catalog-search">Поиск товара</label>
-            <input class="order-form__input" id="catalog-search" type="search" placeholder="Например, MacBook или Sony" autocomplete="off">
-          </div>
           <div class="catalog-controls__group">
             <label for="category-filter">Категория</label>
             <select class="order-form__input" id="category-filter">
@@ -92,10 +84,10 @@
         <div class="catalog-controls__checks">
           <label><input id="availability-filter" type="checkbox"> Только в наличии</label>
           <label><input id="favorites-filter" type="checkbox"> Только избранное</label>
+          <button class="button button--secondary" type="button" data-action="reset-catalog">Сбросить</button>
         </div>
         <p class="catalog-count" aria-live="polite">Загрузка каталога…</p>
       </section>
-      </dialog>
       <p class="catalog-message" role="status" aria-live="polite"></p>
       <p class="catalog-empty" data-catalog-empty hidden>По выбранным условиям товары не найдены. Измените запрос или сбросьте фильтры.</p>
       <noscript><p class="catalog-empty">Для интерактивного каталога необходимо включить JavaScript.</p></noscript>

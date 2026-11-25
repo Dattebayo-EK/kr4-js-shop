@@ -5,6 +5,27 @@
     return;
   }
 
+  shop.makeElement = function makeElement(tag, className = '', text = '') {
+    const element = document.createElement(tag);
+    if (className) {
+      element.className = className;
+    }
+    element.textContent = text;
+    return element;
+  };
+
+  shop.calculateTotals = function calculateTotals(items, discountPercent) {
+    let count = 0;
+    let subtotal = 0;
+    for (const item of items) {
+      const quantity = Number(item.quantity) || 0;
+      count += quantity;
+      subtotal += (Number(item.price) || 0) * quantity;
+    }
+    const discount = Math.round(subtotal * discountPercent / 100);
+    return { count, subtotal, discount, total: subtotal - discount };
+  };
+
   function getPageProduct() {
     const page = window.location.pathname.split('/').pop();
     return shop.products.find((product) => product.page === page);
@@ -20,10 +41,8 @@
   }
 
   function showUnavailableButton(link) {
-    const button = document.createElement('button');
+    const button = shop.makeElement('button', link.className, 'Нет в наличии');
     button.type = 'button';
-    button.className = link.className;
-    button.textContent = 'Нет в наличии';
     button.disabled = true;
     link.replaceWith(button);
   }
@@ -35,7 +54,6 @@
 
   const cartButtons = [];
 
-  // Сначала добавляем товар, а к заявке переходим уже из корзины.
   document.querySelectorAll('.product-card__actions a[href="cart.html"], .product-detail .actions a[href="cart.html"], [data-add-to-cart]').forEach((link) => {
     const product = link.dataset.addToCart
       ? shop.findProductById(link.dataset.addToCart)

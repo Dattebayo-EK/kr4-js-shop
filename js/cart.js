@@ -6,6 +6,7 @@
     return;
   }
 
+  const { makeElement } = shop;
   const emptyState = document.querySelector('[data-cart-empty]');
   const summary = document.querySelector('[data-cart-summary]');
   const countOutput = document.querySelector('[data-cart-count]');
@@ -27,17 +28,15 @@
   function getDetailedCart() {
     return shop.storage.getCart().map((item) => {
       const product = shop.findProductById(item.id);
-      return product ? { product, quantity: item.quantity } : null;
+      return product ? { product, price: product.price, quantity: item.quantity } : null;
     }).filter(Boolean);
   }
 
   function createCartItem(entry) {
-    const { product, quantity } = entry;
-    const article = document.createElement('article');
-    article.classList.add('cart-item');
+    const { product, price, quantity } = entry;
+    const article = makeElement('article', 'cart-item');
 
-    const imageLink = document.createElement('a');
-    imageLink.classList.add('cart-item__image');
+    const imageLink = makeElement('a', 'cart-item__image');
     imageLink.href = product.page;
     const image = document.createElement('img');
     image.src = product.image;
@@ -49,23 +48,16 @@
     imageLink.append(image);
 
     const info = document.createElement('div');
-    const title = document.createElement('h2');
-    title.classList.add('cart-item__title');
-    const titleLink = document.createElement('a');
+    const title = makeElement('h2', 'cart-item__title');
+    const titleLink = makeElement('a', '', product.title);
     titleLink.href = product.page;
-    titleLink.textContent = product.title;
     title.append(titleLink);
-    const status = document.createElement('p');
-    status.classList.add('muted');
-    status.textContent = product.isAvailable ? 'В наличии' : 'Нет в наличии';
+    const status = makeElement('p', 'muted', product.isAvailable ? 'В наличии' : 'Нет в наличии');
 
     const quantityId = `quantity-${product.slug}`;
-    const quantityLabel = document.createElement('label');
-    quantityLabel.classList.add('cart-item__quantity-label');
+    const quantityLabel = makeElement('label', 'cart-item__quantity-label', 'Количество');
     quantityLabel.htmlFor = quantityId;
-    quantityLabel.textContent = 'Количество';
-    const quantityInput = document.createElement('input');
-    quantityInput.classList.add('cart-item__quantity');
+    const quantityInput = makeElement('input', 'cart-item__quantity');
     quantityInput.id = quantityId;
     quantityInput.name = quantityId;
     quantityInput.type = 'number';
@@ -74,27 +66,16 @@
     quantityInput.value = String(quantity);
     quantityInput.dataset.productId = String(product.id);
 
-    const removeButton = document.createElement('button');
-    removeButton.classList.add('cart-item__control', 'cart-item__remove');
+    const removeButton = makeElement('button', 'cart-item__control cart-item__remove', 'Удалить');
     removeButton.type = 'button';
     removeButton.dataset.action = 'remove';
     removeButton.dataset.productId = String(product.id);
     removeButton.setAttribute('aria-label', `Удалить ${product.title} из корзины`);
-    removeButton.textContent = 'Удалить';
     info.append(title, status, quantityLabel, quantityInput, removeButton);
 
-    const price = document.createElement('p');
-    price.classList.add('cart-item__price');
-    price.textContent = shop.formatPrice(product.price * quantity);
-    article.append(imageLink, info, price);
+    const priceOutput = makeElement('p', 'cart-item__price', shop.formatPrice(price * quantity));
+    article.append(imageLink, info, priceOutput);
     return article;
-  }
-
-  function calculateTotals(items) {
-    const count = items.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    const discount = Math.round(subtotal * promoPercent / 100);
-    return { count, subtotal, discount, total: subtotal - discount };
   }
 
   function renderCart() {
@@ -105,11 +86,10 @@
       promoInput.value = '';
       promoMessage.textContent = '';
     }
-    const totals = calculateTotals(items);
+    const totals = shop.calculateTotals(items, promoPercent);
     const fragment = document.createDocumentFragment();
     items.forEach((item) => fragment.append(createCartItem(item)));
-    cartContainer.textContent = '';
-    cartContainer.append(fragment);
+    cartContainer.replaceChildren(fragment);
 
     emptyState.hidden = items.length > 0;
     summary.hidden = items.length === 0;

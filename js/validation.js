@@ -6,6 +6,7 @@
     return;
   }
 
+  const { makeElement, calculateTotals } = shop;
   const productInput = form.querySelector('#page-product');
   const nameInput = form.querySelector('#page-name');
   const emailInput = form.querySelector('#page-email');
@@ -32,15 +33,6 @@
     }
   }
 
-  function createTextElement(tagName, className, text) {
-    const element = document.createElement(tagName);
-    if (className) {
-      className.split(/\s+/).filter(Boolean).forEach((classToken) => element.classList.add(classToken));
-    }
-    element.textContent = text;
-    return element;
-  }
-
   function renderOrderHistory() {
     if (!orderHistoryContainer || !orderHistoryEmpty) {
       return;
@@ -53,19 +45,14 @@
       const items = Array.isArray(order.items)
         ? order.items.filter((item) => item && typeof item === 'object')
         : [];
-      const itemCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-      const subtotal = items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0);
-      const discount = Math.round(subtotal * (Number(order.discountPercent) || 0) / 100);
-      const total = subtotal - discount;
-      const article = document.createElement('article');
-      article.classList.add('order-history__item');
+      const { count, total } = calculateTotals(items, Number(order.discountPercent) || 0);
+      const article = makeElement('article', 'order-history__item');
 
-      const heading = document.createElement('div');
-      heading.classList.add('order-history__heading');
+      const heading = makeElement('div', 'order-history__heading');
       const statusClass = order.status === 'Отменён' ? 'order-status--muted' : 'order-status--success';
       heading.append(
-        createTextElement('h3', '', `Заявка №${order.number || '—'}`),
-        createTextElement('span', `order-status ${statusClass}`, order.status || 'Сохранена локально')
+        makeElement('h3', '', `Заявка №${order.number || '—'}`),
+        makeElement('span', `order-status ${statusClass}`, order.status || 'Сохранена локально')
       );
 
       const createdAt = new Date(order.createdAt);
@@ -73,30 +60,28 @@
         ? 'Дата не указана'
         : new Intl.DateTimeFormat('ru-RU').format(createdAt);
       const deliveryLabels = { pickup: 'Самовывоз', courier: 'Курьерская доставка', point: 'Пункт выдачи' };
-      article.append(heading, createTextElement('p', 'muted', `${date} · ${deliveryLabels[order.delivery] || 'Способ получения не указан'}`));
+      article.append(heading, makeElement('p', 'muted', `${date} · ${deliveryLabels[order.delivery] || 'Способ получения не указан'}`));
 
       if (items.length > 0) {
         if (items.length === 1) {
           const product = shop.findProductById(items[0].id);
-          const titleLink = createTextElement('a', '', product ? product.title : 'Товар');
+          const titleLink = makeElement('a', '', product ? product.title : 'Товар');
           titleLink.href = product ? product.page : 'catalog.html';
           article.append(titleLink);
         } else {
           const itemList = document.createElement('ul');
           items.forEach((item) => {
             const product = shop.findProductById(item.id);
-            const line = document.createElement('li');
-            line.textContent = `${product ? product.title : 'Товар'} — ${Number(item.quantity) || 0} шт.`;
-            itemList.append(line);
+            itemList.append(makeElement('li', '', `${product ? product.title : 'Товар'} — ${Number(item.quantity) || 0} шт.`));
           });
           article.append(itemList);
         }
-        article.append(createTextElement('p', 'order-history__price', `${itemCount} шт. · ${shop.formatPrice(total)}`));
+        article.append(makeElement('p', 'order-history__price', `${count} шт. · ${shop.formatPrice(total)}`));
       } else {
-        article.append(createTextElement('p', '', order.product || 'Состав заявки не указан'));
+        article.append(makeElement('p', '', order.product || 'Состав заявки не указан'));
       }
 
-      const contactLink = createTextElement('a', '', order.status ? 'Обратиться по заявке →' : 'Посмотреть контакты →');
+      const contactLink = makeElement('a', '', order.status ? 'Обратиться по заявке →' : 'Посмотреть контакты →');
       contactLink.href = 'contacts.html#feedback';
       article.append(contactLink);
       fragment.append(article);
@@ -142,69 +127,52 @@
   }
 
   function updateProductOptions() {
-    productInput.replaceChildren();
-    const cartItems = getCartItems();
-    const count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const discount = shop.storage.getPromoCode() === 'DORA10' ? Math.round(subtotal * 0.1) : 0;
+    const discountPercent = shop.storage.getPromoCode() === 'DORA10' ? 10 : 0;
+    const { count, total } = calculateTotals(getCartItems(), discountPercent);
     const cartLabel = count > 0
-      ? `Состав из корзины: ${count} шт. — ${shop.formatPrice(subtotal - discount)}`
+      ? `Состав из корзины: ${count} шт. — ${shop.formatPrice(total)}`
       : 'Сначала добавьте товары в корзину';
     const cartOption = new Option(cartLabel, count > 0 ? 'cart' : '');
     cartOption.disabled = count === 0;
-    productInput.append(cartOption);
-    productInput.value = count > 0 ? 'cart' : '';
+    productInput.replaceChildren(cartOption);
+    productInput.value = cartOption.value;
+  }
+
+  function validateField(input, isValid, message) {
+    if (!isValid) {
+      showError(input, message);
+      return false;
+    }
+    clearError(input);
+    return true;
   }
 
   function validateProduct() {
-    if (getSelectedItems().length === 0) {
-      const message = 'Добавьте товары в корзину перед оформлением заявки.';
-      showError(productInput, message);
-      return false;
-    }
-    clearError(productInput);
-    return true;
+    const hasItems = getSelectedItems().length > 0;
+    return validateField(productInput, hasItems, 'Добавьте товары в корзину перед оформлением заявки.');
   }
 
   function validateName() {
     const value = nameInput.value.trim();
-    if (value.length < 2 || !/^[А-ЯЁA-Z][А-ЯЁA-Zа-яёa-z\s-]+$/i.test(value)) {
-      showError(nameInput, 'Введите имя не короче двух символов, без цифр.');
-      return false;
-    }
-    clearError(nameInput);
-    return true;
+    const isValid = value.length >= 2 && /^[А-ЯЁA-Z][А-ЯЁA-Zа-яёa-z\s-]+$/i.test(value);
+    return validateField(nameInput, isValid, 'Введите имя не короче двух символов, без цифр.');
   }
 
   function validateEmail() {
     const value = emailInput.value.trim();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(value)) {
-      showError(emailInput, 'Введите корректный e-mail.');
-      return false;
-    }
-    clearError(emailInput);
-    return true;
+    return validateField(emailInput, emailPattern.test(value), 'Введите корректный e-mail.');
   }
 
   function validatePhone() {
     const value = phoneInput.value.trim();
     const digits = value.replace(/\D/g, '');
-    if (!/^[0-9+()\s-]+$/.test(value) || digits.length < 10 || digits.length > 11) {
-      showError(phoneInput, 'Введите телефон из 10–11 цифр.');
-      return false;
-    }
-    clearError(phoneInput);
-    return true;
+    const isValid = /^[0-9+()\s-]+$/.test(value) && digits.length >= 10 && digits.length <= 11;
+    return validateField(phoneInput, isValid, 'Введите телефон из 10–11 цифр.');
   }
 
   function validateAgreement() {
-    if (!agreementInput.checked) {
-      showError(agreementInput, 'Подтвердите, что заявка учебная.');
-      return false;
-    }
-    clearError(agreementInput);
-    return true;
+    return validateField(agreementInput, agreementInput.checked, 'Подтвердите, что заявка учебная.');
   }
 
   function saveOrder(order) {

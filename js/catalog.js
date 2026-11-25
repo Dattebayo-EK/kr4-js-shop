@@ -6,6 +6,7 @@
     return;
   }
 
+  const { makeElement } = shop;
   const searchInput = document.querySelector('#catalog-search');
   const categoryFilter = document.querySelector('#category-filter');
   const sortSelect = document.querySelector('#sort-select');
@@ -15,9 +16,6 @@
   const catalogCount = document.querySelector('.catalog-count');
   const catalogEmpty = document.querySelector('[data-catalog-empty]');
   const catalogMessage = document.querySelector('.catalog-message');
-  const catalogDialog = document.querySelector('#catalog-dialog');
-  const openDialogButton = document.querySelector('[data-action="open-catalog-dialog"]');
-  const closeDialogButton = document.querySelector('[data-action="close-catalog-dialog"]');
 
   const catalogState = {
     query: '',
@@ -92,24 +90,13 @@
     return true;
   }
 
-  function makeElement(tagName, className, value) {
-    const element = document.createElement(tagName);
-    if (className) {
-      element.className = className;
-    }
-    element.textContent = value;
-    return element;
-  }
-
   function createProductCard(product) {
-    const card = document.createElement('article');
-    card.classList.add('product-card');
+    const card = makeElement('article', 'product-card');
     if (product.discountPercent > 0) {
       card.classList.add('product-card--discount');
     }
 
-    const image = document.createElement('img');
-    image.classList.add('product-card__image');
+    const image = makeElement('img', 'product-card__image');
     if (product.slug === 'pixel-7-pro') {
       image.classList.add('product-card__image--contain');
     }
@@ -133,23 +120,20 @@
     }
 
     const category = makeElement('p', 'product-card__category', product.categoryLabel);
-    const title = document.createElement('h3');
-    title.classList.add('product-card__title');
+    const title = makeElement('h3', 'product-card__title');
     const titleLink = makeElement('a', '', product.title);
     titleLink.href = product.page;
     title.append(titleLink);
 
     const description = makeElement('p', 'product-card__description', product.description);
-    const specs = document.createElement('ul');
-    specs.classList.add('product-card__specs');
+    const specs = makeElement('ul', 'product-card__specs');
     product.specs.forEach((spec) => specs.append(makeElement('li', '', spec)));
     const price = makeElement('p', 'product-card__price', shop.formatPrice(product.price));
     if (product.oldPrice) {
       price.append(document.createTextNode(' '), makeElement('del', 'product-card__old-price', shop.formatPrice(product.oldPrice)));
     }
 
-    const actions = document.createElement('div');
-    actions.classList.add('product-card__actions');
+    const actions = makeElement('div', 'product-card__actions');
     const details = makeElement('a', 'button', 'Подробнее');
     details.href = product.page;
 
@@ -220,17 +204,6 @@
       catalogMessage.textContent = '';
     }, 3000);
   }
-
-  openDialogButton.addEventListener('click', () => {
-    catalogDialog.showModal();
-    searchInput.focus();
-  });
-  closeDialogButton.addEventListener('click', () => catalogDialog.close());
-  catalogDialog.addEventListener('click', (event) => {
-    if (event.target === catalogDialog) {
-      catalogDialog.close();
-    }
-  });
 
   searchInput.addEventListener('input', (event) => {
     catalogState.query = event.target.value;
