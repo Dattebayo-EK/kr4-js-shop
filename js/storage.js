@@ -22,6 +22,7 @@ window.DoraShop = window.DoraShop || {};
     }
   }
 
+
   function write(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
@@ -114,3 +115,4 @@ window.DoraShop = window.DoraShop || {};
 
   shop.storage = { getCart, saveCart, addToCart, hasCartItem, getFavorites, toggleFavorite, getPromoCode, savePromoCode };
 })(window.DoraShop);
+
